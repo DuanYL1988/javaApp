@@ -1,8 +1,7 @@
 package com.algorithm;
 
 public class Lesson1 {
-    private static final int[] question = new int[] { 1, -2, 3, 10, -4, 7, 2,
-            -5 };
+    private static final int[] question = new int[] { 1, -2, 3, 10, -4, 7, 2, -5 };
 
     public static void main(String[] args) {
         Lesson1 lesson = new Lesson1();
@@ -29,12 +28,4 @@ public class Lesson1 {
         return maxsum;
     }
 
-    public String getMaxInfo(int j, int k) {
-        String info = "[";
-        for (int i = 0; i < k; i++) {
-            info += question[j + i] + ",";
-        }
-        info += "]";
-        return info;
-    }
 }

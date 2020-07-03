@@ -8,7 +8,7 @@ public class OneToNinetynine {
 
     public int[] numList;
 
-    private DateTimeUtil timeUtil = new DateTimeUtil();
+    private final DateTimeUtil timeUtil = new DateTimeUtil();
 
     public OneToNinetynine(int start, int count) {
         numList = new int[count];
@@ -37,6 +37,7 @@ public class OneToNinetynine {
     }
 
     private int getSum02() {
+        Date start = new Date();
         int sum = 0;
         if (numList.length % 2 == 0) {
             int onePare = numList[0] + numList[numList.length - 1];
@@ -49,6 +50,8 @@ public class OneToNinetynine {
             sum = onePare * pareCount;
             sum += numList[mid];
         }
+        Date end = new Date();
+        timeUtil.getMs(start, end);
         return sum;
     }
 
