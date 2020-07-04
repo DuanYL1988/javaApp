@@ -141,7 +141,6 @@ public class MainFrame extends JFrame implements ActionListener {
     /**
      * 主处理
      */
-    @Override
     public void actionPerformed(ActionEvent action) {
         String websit = textWebsit.getText();
         String account = textUserAccount.getText();
