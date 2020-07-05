@@ -1,6 +1,7 @@
 package com.util;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import com.pojo.Field;
 
@@ -29,18 +30,25 @@ public class FileTextUtil {
      *            insert during current index currIdx
      * @return insert value
      */
-    public String setValueByType(Field field, int currIdx,int colIndex) {
+    public String setValueByType(Field field,Properties prop, int currIdx,int colIndex) {
 
         String result = "";
         String type = field.getDbType();
         // text
         if (Arrays.asList(DB_VARCHAR_TYPE).contains(type)) {
             String value =field.getValue();
-            if (StringUtils.isEmpty(field.getValue())) {
+            if("RECODE_USER_CD".equals(field.getDbNm().toUpperCase())) {
+                // get update user code
+                value = prop.getProperty("USER_CD","Duan Yl");
+            } else if ("RECODE_DATE".equals(field.getDbNm().toUpperCase())) {
+                // get update date
+                value = prop.getProperty("UPDATE_DATE","Duan Yl");
+                value = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
+            } else if (StringUtils.isEmpty(value)) {
                 value = setFillText("ITEM**", "*", "0", String.valueOf(colIndex),field.getSize());
                 value = value+"_***";
+                result = setFillText(value, "*", "0", String.valueOf(currIdx),field.getSize());
             }
-            result = setFillText(value, "*", "0", String.valueOf(currIdx),field.getSize());
             return "'" + result + "'";
         } else if (Arrays.asList(DB_NUMBER_TYPE).contains(type)) {
             return currIdx + "";

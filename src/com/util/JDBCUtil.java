@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import com.common.Code;
 
@@ -17,9 +18,24 @@ public class JDBCUtil {
 
     private final SecurityUtil security;
 
-    public JDBCUtil(String propFileNm) {
+    public JDBCUtil(Properties prop) {
         security = new SecurityUtil();
-        PropertyUtil propUtil = new PropertyUtil(propFileNm);
+        prop.getProperty(Code.DB_DRIVER);
+        DRIVE_CLASS = prop.getProperty(Code.DB_DRIVER);
+        URL = prop.getProperty(Code.DB_URL);
+        USERNAME = prop.getProperty(Code.DB_USER);
+        PASSWORD = prop.getProperty(Code.DB_PASSWORD);
+
+        try {
+            Class.forName(DRIVE_CLASS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public JDBCUtil() {
+        security = new SecurityUtil();
+        PropertyUtil propUtil = new PropertyUtil();
 
         DRIVE_CLASS = propUtil.getParamByKey(Code.DB_DRIVER, null, Code.MODE_PARAM);
         URL = propUtil.getParamByKey(Code.DB_URL, null, Code.MODE_PARAM);
@@ -88,7 +104,7 @@ public class JDBCUtil {
         return resultText;
     }
 
-    private ResultSet executeQuary(String sql) {
+    public ResultSet executeQuary(String sql) {
         ResultSet result = null;
         try {
             Connection conn = getConnection();
@@ -100,13 +116,12 @@ public class JDBCUtil {
         return result;
     }
 
-    private void insertIntoDB(String sql) {
+    public void insertIntoDB(String sql) {
         Connection conn = getConnection();
         Statement st = null;
         try {
             st = conn.createStatement();
-            boolean flg = st.execute(sql);
-            System.out.println(flg);
+            st.execute(sql);
             closeConnection(st, conn);
         } catch (SQLException e) {
             e.printStackTrace();

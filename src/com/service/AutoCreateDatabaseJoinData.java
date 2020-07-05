@@ -12,7 +12,6 @@ import java.util.Set;
 
 import com.pojo.Field;
 import com.pojo.Table;
-import com.util.DateTimeUtil;
 import com.util.FileTextUtil;
 import com.util.FileUtils;
 import com.util.JDBCUtil;
@@ -35,7 +34,7 @@ public class AutoCreateDatabaseJoinData {
     /* Text util */
     FileTextUtil textUtil = new FileTextUtil();
     /* Text util */
-    JDBCUtil util = new JDBCUtil(PROP_FILE);
+    JDBCUtil jdbcUtil;
 
     /* Properties util */
     Properties prop;
@@ -67,6 +66,7 @@ public class AutoCreateDatabaseJoinData {
             System.out.println("PROPERTIES FILE WILL NOT FOUND,CHECK PLEASE!");
             return;
         }
+        jdbcUtil = new JDBCUtil(prop);
         // Get Table Relation
         joinRealtionText = fileUtil.getFileText(new File(path + "//" + JOIN_FILE));
     }
@@ -189,7 +189,7 @@ public class AutoCreateDatabaseJoinData {
                 if (i == 0) {
                     csv.append("\"" + field.getDbNm() + "\"");
                 } else {
-                    csv.append(textUtil.setValueByType(field, i , colIndex));
+                    csv.append(textUtil.setValueByType(field, prop, i , colIndex));
                 }
                 if (colIndex < fields.size() - 1) {
                     csv.append(",");
@@ -250,17 +250,9 @@ public class AutoCreateDatabaseJoinData {
 
                 // Set fixed colunm value
                 String value = "";
-                if("RECODE_USER_CD".equals(field.getDbNm().toUpperCase())) {
-                    // get update user code
-                    value = prop.getProperty("USER_CD","Duan Yl");
-                } else if ("RECODE_DATE".equals(field.getDbNm().toUpperCase())) {
-                    // get update date
-                    value = prop.getProperty("UPDATE_DATE","Duan Yl");
-                    value = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
-                } else {
-                    // get insert value from field seted
-                    value = textUtil.setValueByType(field, currIdx,colIndex);
-                }
+
+                value = textUtil.setValueByType(field,prop,currIdx,colIndex);
+
                 insertValpart.append(value);
 
                 if (colIndex < fields.size() - 1) {
@@ -274,13 +266,19 @@ public class AutoCreateDatabaseJoinData {
             // insert excute
             if ("1".equals(excute)) {
                 excuteQuery.append(insertColpart);
-                if (currIdx%100 == 0) {
-                    // TODO jdbc
-
+                String txt = prop.getProperty("INSERT_LIMIT");
+                int limit = StringUtils.isNotEmpty(txt) ? Integer.parseInt(txt) : 5000;
+                if (currIdx%limit == 0) {
+                    // jdbc
+                    jdbcUtil.insertIntoDB(excuteQuery.toString());
                     excuteQuery = new StringBuilder("");
                 }
             }
         }
+        // insert remainder
+         if (excuteQuery.toString().length()>0 && "1".equals(excute)) {
+             jdbcUtil.insertIntoDB(excuteQuery.toString());
+         }
         return result.toString();
     }
 
