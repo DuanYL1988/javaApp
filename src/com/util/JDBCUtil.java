@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.common.Code;
 
 public class JDBCUtil {
@@ -23,7 +26,10 @@ public class JDBCUtil {
     private Connection conn;
     private Statement st;
 
+    Logger logger;
     public JDBCUtil(Properties prop) {
+        logger = LoggerFactory.getLogger(this.getClass());
+        logger.info("データベース接続情報取得");
         prop.getProperty(Code.DB_DRIVER);
         DRIVE_CLASS = prop.getProperty(Code.DB_DRIVER);
         URL = prop.getProperty(Code.DB_URL);
@@ -33,6 +39,7 @@ public class JDBCUtil {
         try {
             Class.forName(DRIVE_CLASS);
         } catch (Exception e) {
+            logger.error("データベース接続失敗");
             e.printStackTrace();
         }
     }
@@ -90,10 +97,10 @@ public class JDBCUtil {
         getStatement();
         Boolean result = null;
         try {
-            System.out.println(sql);
+            logger.info("sql実行する : "+sql);
             result = st.execute(sql);
         } catch (SQLException e) {
-            System.out.println("-> Excute SQL Error!");
+            logger.error("-> Excute SQL Error!");
             e.printStackTrace();
         }
         closeConnection();
@@ -104,13 +111,11 @@ public class JDBCUtil {
         getStatement();
         ResultSet result = null;
         try {
-            System.out.println(query);
+            logger.info("-> SQL : " + query);
             result = st.executeQuery(query);
-            System.out.println("-> Excute SQL SUCCESS!");
+            logger.info("-> Excute SQL SUCCESS");
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("-> Excute SQL Error!");
-            System.out.println("-> SQL : " + query);
+            logger.info("-> Excute SQL Error!");
         }
         return result;
     }
@@ -119,9 +124,9 @@ public class JDBCUtil {
         getConnection();
         try {
             st = conn.createStatement();
-            System.out.println("-> Create Statement SUCCESS");
+            logger.info("-> Create Statement SUCCESS");
         } catch (SQLException e) {
-            System.out.println("-> Create Statement Error!");
+            logger.error("-> Create Statement Error!");
         }
     }
 
@@ -130,13 +135,13 @@ public class JDBCUtil {
      */
     private void getConnection() {
         try {
-            System.out.println("-> CONNECT TO DATABASE");
+            logger.info("-> CONNECT TO DATABASE");
             Class.forName(DRIVE_CLASS);
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
-            System.out.println("-> Get Connection Error!");
+            logger.error("-> Get Connection Error!");
         } catch (ClassNotFoundException e) {
-            System.out.println("-> Load Oracle Driver Error!");
+            logger.error("-> Load Driver Error!");
         }
     }
 
@@ -173,7 +178,7 @@ public class JDBCUtil {
                 cols[i] = result.getMetaData().getColumnName(i + 1);
             }
         } catch (SQLException e) {
-            System.out.println("->ResultSet.getColumnName Error!!");
+            logger.error("->ResultSet.getColumnName Error!!");
         }
         if (null!=cols) {
             for (String col : cols) {

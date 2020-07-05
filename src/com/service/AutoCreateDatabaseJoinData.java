@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.exception.LocalException;
 import com.pojo.Field;
 import com.pojo.Table;
+import com.util.DateTimeUtil;
 import com.util.FileTextUtil;
 import com.util.FileUtils;
 import com.util.JDBCUtil;
@@ -67,7 +69,7 @@ public class AutoCreateDatabaseJoinData {
             prop = new Properties();
             prop.load(reader);
         } catch (Exception e) {
-            System.out.println("PROPERTIES FILE WILL NOT FOUND,CHECK PLEASE!");
+            logger.error(e.getMessage());
             return;
         }
         jdbcUtil = new JDBCUtil(prop);
@@ -100,8 +102,7 @@ public class AutoCreateDatabaseJoinData {
                 // Get join column value on join part
                 setTblLink(textLine);
             } else if (textLine.indexOf("WHERE") >= 0) {
-                // after where part get column value without join keywords[AND
-                // ON]
+                // after where part get column value without join keywords[AND ON]
                 whereFlag = true;
             } else if (whereFlag && textLine.indexOf(" = ") >= 0) {
                 // after where part
@@ -148,15 +149,18 @@ public class AutoCreateDatabaseJoinData {
     private void doServic() throws LocalException {
         String mode = prop.getProperty("OUTPUT", "SQL");
         Set<String> keys = tableMap.keySet();
-        for (String key : keys) {
-
-            if ("SQL".equals(mode)) {
-                logger.info("Insertファイル出力開始");
+        if ("SQL".equals(mode)) {
+            logger.info("Insertファイル出力開始");
+            for (String key : keys) {
                 createInsertQuery(tableMap.get(key));
-            } else if ("CSV".equals(mode)) {
-                logger.info("CSVファイル出力開始");
+            }
+            logger.info("Insertファイル出力終了");
+        } else if ("CSV".equals(mode)) {
+            logger.info("CSVファイル出力開始");
+            for (String key : keys) {
                 createCsv(tableMap.get(key));
             }
+            logger.info("CSVファイル出力終了");
         }
     }
 
@@ -233,7 +237,7 @@ public class AutoCreateDatabaseJoinData {
             return;
         String query = insertCreater(tableNm, fields);
 
-        BufferedWriter bw = fileUtil.getWriter(path + "//" + "INSERT_" + tableNm + ".sql");
+        BufferedWriter bw = fileUtil.getWriter(path + "//" + "99_RST_" + tableNm + ".sql");
         fileUtil.writeFileAndPrintConsole(query, bw);
         fileUtil.closeWriteSteam(bw);
     }
@@ -249,14 +253,16 @@ public class AutoCreateDatabaseJoinData {
      */
     private String insertCreater(String tableNm, List<Field> fields) throws LocalException {
 
+        String excute = (String) prop.getOrDefault("EXCUTE_FLAG", "0");
+        checkBefInsert(tableNm,excute);
         // Insert count
         int insertCount = Integer.parseInt((String) prop.get(tableNm));
         // One data column index
         StringBuilder result = new StringBuilder();
 
-        String excute = (String) prop.getOrDefault("EXCUTE_FLAG", "0");
         StringBuilder excuteQuery = new StringBuilder();
         // LOOP INSERT
+        Date start = new Date();
         for (int currIdx = 1; currIdx <= insertCount; currIdx++) {
 
             StringBuilder insertColpart = new StringBuilder("INSERT INTO " + tableNm + "(");
@@ -279,10 +285,9 @@ public class AutoCreateDatabaseJoinData {
             result.append(insertColpart);
             // insert excute
             if ("1".equals(excute)) {
-                checkBefInsert(tableNm);
                 excuteQuery.append(insertColpart);
                 String txt = prop.getProperty("INSERT_LIMIT");
-                int limit = StringUtils.isNotEmpty(txt) ? Integer.parseInt(txt) : 5000;
+                int limit = StringUtils.isNotEmpty(txt) ? Integer.parseInt(txt) : 1000;
                 if (currIdx % limit == 0) {
                     // jdbc
                     jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
@@ -294,12 +299,18 @@ public class AutoCreateDatabaseJoinData {
         if (excuteQuery.toString().length() > 0 && "1".equals(excute)) {
             jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
         }
+        Date end = new Date();
+        logger.info("実行時間"+DateTimeUtil.getUseTime(start, end)+" ms");
         return result.toString();
     }
 
-    private void checkBefInsert(String tableNm) throws LocalException {
+    private void checkBefInsert(String tableNm,String excute) throws LocalException {
 
         String updUserCd = prop.getProperty("USER_CD");
+
+        if ("0".equals(excute)) {
+            return;
+        }
         if (StringUtils.isEmpty(updUserCd)) {
             throw new LocalException("user code not set yet,please ");
         }
