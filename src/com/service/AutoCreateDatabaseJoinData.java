@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.exception.LocalException;
 import com.pojo.Field;
 import com.pojo.Table;
@@ -50,10 +53,14 @@ public class AutoCreateDatabaseJoinData {
     /* */
     Table preTable = null;
 
+    Logger logger = null;
+
     /**
      * Build method
      */
     public AutoCreateDatabaseJoinData() {
+        logger = LoggerFactory.getLogger(this.getClass());
+        logger.info("処理開始");
         // Get Properties
         try {
             FileReader reader = new FileReader(path + "//" + PROP_FILE);
@@ -106,9 +113,10 @@ public class AutoCreateDatabaseJoinData {
         }
         try {
             doServic();
-            System.out.println("SUCCESS END");
+            logger.info("処理正常終了");
         } catch (LocalException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -143,10 +151,10 @@ public class AutoCreateDatabaseJoinData {
         for (String key : keys) {
 
             if ("SQL".equals(mode)) {
-
+                logger.info("Insertファイル出力開始");
                 createInsertQuery(tableMap.get(key));
             } else if ("CSV".equals(mode)) {
-
+                logger.info("CSVファイル出力開始");
                 createCsv(tableMap.get(key));
             }
         }
@@ -169,6 +177,7 @@ public class AutoCreateDatabaseJoinData {
             String tblNm = file.getName().substring(0, file.getName().indexOf("."));
             // While Table DDL existed
             if (tblNm.equals(tableNm)) {
+                logger.info(tableNm+"テーブルカラム情報取得");
                 Table table = fileUtil.getFieldListFromDDL(file);
                 // get table put into map
                 tableMap.put(tableNm, table);
