@@ -33,4 +33,8 @@ public class TextUtil {
         return value;
     }
 
+    public static void main(String[] args) {
+        String name = "ON HERO.COLOR";
+        System.out.println(name.substring(2));
+    }
 }

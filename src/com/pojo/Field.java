@@ -18,7 +18,7 @@ public class Field {
 
     private boolean existColumn;
 
-    private String prefixValue;
+    private String value;
 
     public String getDbNm() {
         return dbNm;
@@ -84,13 +84,12 @@ public class Field {
         this.existColumn = existColumn;
     }
 
-    public String getPrefixValue() {
-        return prefixValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setPrefixValue(String prefixValue) {
-        this.prefixValue = prefixValue;
+    public void setValue(String value) {
+        this.value = value;
     }
-
 
 }

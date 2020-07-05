@@ -17,19 +17,18 @@ public class PropertyUtil {
 
     private static final String FILE_NAME_PARAM = "param.properties";
 
-    private static final String FILE_NAME_DATA = "data.pswd";
-
     private final FileReadWriteUtil fileUtil = new FileReadWriteUtil();
 
     /**
      * 构造方法
      */
-    public PropertyUtil() {
+    public PropertyUtil(String fileNm) {
         File file = new File("");
-        FILE_PATH_PARAM = file.getAbsolutePath() + "\\" + FILE_NAME_PARAM;
-        FILE_PATH_OUTPUT = file.getAbsolutePath() + "\\" + FILE_NAME_DATA;
+        if(null == fileNm || "".equals(fileNm)) {
+            fileNm = FILE_NAME_PARAM;
+        }
+        FILE_PATH_PARAM = file.getAbsolutePath() + "\\" + fileNm;
         fileUtil.initFile(FILE_PATH_PARAM);
-        fileUtil.initFile(FILE_PATH_OUTPUT);
     }
 
     /**

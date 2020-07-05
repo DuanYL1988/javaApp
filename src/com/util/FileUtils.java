@@ -13,14 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.pojo.Field;
+import com.pojo.Table;
 
 public class FileUtils {
-
-    public static void main(String[] args) {
-        FileUtils thisClass = new FileUtils();
-        String localPath = thisClass.getPath();
-        System.out.println(localPath);
-    }
 
     /**
      * 取得文件内容
@@ -49,22 +44,31 @@ public class FileUtils {
      * @param file
      * @return
      */
-    public List<Field> getFieldListFromDDL(File file) {
+    public Table getFieldListFromDDL(File file) {
+        Table table = new Table();
+        table.setName(file.getName().substring(0,file.getName().indexOf(".")));
         List<Field> fieldList = new ArrayList<Field>();
+        Map<String,Field> fieldMap = new HashMap<String, Field>();
         try {
             @SuppressWarnings("resource")
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = null;
             while (null != (line = br.readLine())) {
+
+                if (");".equals(line)) continue;
+
                 Field field = getFieldInfoFromDDL(line);
                 if (null != field) {
                     fieldList.add(field);
+                    fieldMap.put(field.getDbNm(), field);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return fieldList;
+        table.setFieldList(fieldList);
+        table.setFieldMap(fieldMap);
+        return table;
     }
 
     /**
@@ -140,7 +144,14 @@ public class FileUtils {
     public String changeType(String type, String direct) {
         Map<String, String> mapping = new HashMap<String, String>();
         mapping.put("VARCHAR2", "String");
+        mapping.put("VARCHA2", "String");
+        mapping.put("CHAR", "String");
+        mapping.put("CHARACTER", "String");
         mapping.put("NUMBER", "Integer");
+        mapping.put("INT", "Integer");
+        mapping.put("NUMERIC", "Integer");
+        mapping.put("BIGINT", "Bigdecimal");
+        mapping.put("DECIMAL", "Bigdecimal");
         mapping.put("TIMESTAMP", "Date");
         Set<String> keys = mapping.keySet();
         for (String db : keys) {
@@ -158,8 +169,14 @@ public class FileUtils {
         return "";
     }
 
+    /**
+     * 从DDL读取数据库表字段信息
+     *
+     * @param line
+     * @return
+     */
     private Field getFieldInfoFromDDL(String line) {
-        if (line.indexOf("CREATE TABLE") >= 0 || line.indexOf("PRIMARY KEY") >= 0 ) {
+        if (line.toUpperCase().indexOf("CREATE TABLE") >= 0 || line.toUpperCase().indexOf("PRIMARY KEY") >= 0 ) {
             return null;
         } else {
             Field field = new Field();
@@ -174,8 +191,12 @@ public class FileUtils {
             }
             field.setDbType(type);
             field.setJavaType(changeType(type, "1"));
-            String logicNm = (lineInfo[lineInfo.length-1].replace("--", ""));
-            field.setPrefixValue(logicNm);
+            // set value
+            String loginNm = "";
+            if (line.indexOf("--")>0) {
+                loginNm = line.substring(line.indexOf("--")+2);
+            }
+            field.setValue(loginNm);
 
             return field;
         }

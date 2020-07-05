@@ -1,6 +1,7 @@
 package com.pojo;
 
 import java.util.List;
+import java.util.Map;
 
 public class Table {
 
@@ -10,7 +11,7 @@ public class Table {
 
     private String joinTableNm;
 
-    private List<Field> joinField;
+    private Map<String,Field> fieldMap;
 
     public String getName() {
         return name;
@@ -36,12 +37,12 @@ public class Table {
         this.joinTableNm = joinTableNm;
     }
 
-    public List<Field> getJoinField() {
-        return joinField;
+    public Map<String, Field> getFieldMap() {
+        return fieldMap;
     }
 
-    public void setJoinField(List<Field> joinField) {
-        this.joinField = joinField;
+    public void setFieldMap(Map<String, Field> fieldMap) {
+        this.fieldMap = fieldMap;
     }
 
 }

@@ -25,7 +25,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private static PropertyUtil propUtil = new PropertyUtil();
+    private static PropertyUtil propUtil = new PropertyUtil("");
 
     private final SecurityUtil security = new SecurityUtil();
 
@@ -141,6 +141,7 @@ public class MainFrame extends JFrame implements ActionListener {
     /**
      * 主处理
      */
+    @Override
     public void actionPerformed(ActionEvent action) {
         String websit = textWebsit.getText();
         String account = textUserAccount.getText();
@@ -158,7 +159,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
         // DB mode
         if (db) {
-            JDBCUtil util = new JDBCUtil();
+            JDBCUtil util = new JDBCUtil("");
             if ("查找".equals(kbn)) {
                 String result = util.dbConnection(websit, account, bank_kbn);
                 if (!TextUtil.isNotEmpty(result)) {

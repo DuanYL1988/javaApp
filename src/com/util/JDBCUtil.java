@@ -17,9 +17,9 @@ public class JDBCUtil {
 
     private final SecurityUtil security;
 
-    public JDBCUtil() {
+    public JDBCUtil(String propFileNm) {
         security = new SecurityUtil();
-        PropertyUtil propUtil = new PropertyUtil();
+        PropertyUtil propUtil = new PropertyUtil(propFileNm);
 
         DRIVE_CLASS = propUtil.getParamByKey(Code.DB_DRIVER, null, Code.MODE_PARAM);
         URL = propUtil.getParamByKey(Code.DB_URL, null, Code.MODE_PARAM);
