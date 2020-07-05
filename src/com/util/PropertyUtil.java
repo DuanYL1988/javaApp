@@ -22,12 +22,9 @@ public class PropertyUtil {
     /**
      * 构造方法
      */
-    public PropertyUtil(String fileNm) {
+    public PropertyUtil() {
         File file = new File("");
-        if(null == fileNm || "".equals(fileNm)) {
-            fileNm = FILE_NAME_PARAM;
-        }
-        FILE_PATH_PARAM = file.getAbsolutePath() + "\\" + fileNm;
+        FILE_PATH_PARAM = file.getAbsolutePath() + "\\" + FILE_NAME_PARAM;
         fileUtil.initFile(FILE_PATH_PARAM);
     }
 
