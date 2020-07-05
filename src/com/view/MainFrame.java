@@ -16,7 +16,6 @@ import javax.swing.JTextField;
 
 import com.common.Code;
 import com.util.FileReadWriteUtil;
-import com.util.JDBCUtil;
 import com.util.PropertyUtil;
 import com.util.SecurityUtil;
 import com.util.TextUtil;
@@ -159,9 +158,9 @@ public class MainFrame extends JFrame implements ActionListener {
         }
         // DB mode
         if (db) {
-            JDBCUtil util = new JDBCUtil();
             if ("查找".equals(kbn)) {
-                String result = util.dbConnection(websit, account, bank_kbn);
+//                String result = util.dbConnection(websit, account, bank_kbn);
+                String result = "";
                 if (!TextUtil.isNotEmpty(result)) {
                     resultText.append(Code.MSG_SELECT_MARRING);
                 } else {
@@ -172,7 +171,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (bank_kbn) {
                     account = security.enCrypt(account);
                 }
-                resultText.append(util.updateDb(websit, account, password));
+                resultText.append("");
             }
             // file mode
         } else {
