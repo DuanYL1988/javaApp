@@ -20,6 +20,7 @@ public class Code {
 
     public static final String SPILT = ";";
     public static final String ENTRY = "\n";
+    public static final String TAB = "\t";
     public static final String LOGOUTPUT = "\n DEBUGLOG:";
 
     /**
@@ -62,75 +63,44 @@ public class Code {
     public static final String BLADE_ATTR_EARTH = "Earth";
     public static final String BLADE_ATTR_THUNDER = "Thunder";
 
-    public static final String[] COMBO_01 = new String[] { BLADE_ATTR_FIRE,
-            BLADE_ATTR_FIRE, BLADE_ATTR_FIRE };
-    public static final String[] COMBO_02 = new String[] { BLADE_ATTR_FIRE,
-            BLADE_ATTR_FIRE, BLADE_ATTR_LIGHT };
-    public static final String[] COMBO_03 = new String[] { BLADE_ATTR_FIRE,
-            BLADE_ATTR_WATER, BLADE_ATTR_ICE };
-    public static final String[] COMBO_04 = new String[] { BLADE_ATTR_FIRE,
-            BLADE_ATTR_WATER, BLADE_ATTR_FIRE };
+    public static final String[] COMBO_01 = new String[] { BLADE_ATTR_FIRE, BLADE_ATTR_FIRE, BLADE_ATTR_FIRE };
+    public static final String[] COMBO_02 = new String[] { BLADE_ATTR_FIRE, BLADE_ATTR_FIRE, BLADE_ATTR_LIGHT };
+    public static final String[] COMBO_03 = new String[] { BLADE_ATTR_FIRE, BLADE_ATTR_WATER, BLADE_ATTR_ICE };
+    public static final String[] COMBO_04 = new String[] { BLADE_ATTR_FIRE, BLADE_ATTR_WATER, BLADE_ATTR_FIRE };
 
-    public static final String[] COMBO_05 = new String[] { BLADE_ATTR_WIND,
-            BLADE_ATTR_WIND, BLADE_ATTR_EARTH };
-    public static final String[] COMBO_06 = new String[] { BLADE_ATTR_WIND,
-            BLADE_ATTR_WIND, BLADE_ATTR_THUNDER };
-    public static final String[] COMBO_07 = new String[] { BLADE_ATTR_WIND,
-            BLADE_ATTR_ICE, BLADE_ATTR_ICE };
+    public static final String[] COMBO_05 = new String[] { BLADE_ATTR_WIND, BLADE_ATTR_WIND, BLADE_ATTR_EARTH };
+    public static final String[] COMBO_06 = new String[] { BLADE_ATTR_WIND, BLADE_ATTR_WIND, BLADE_ATTR_THUNDER };
+    public static final String[] COMBO_07 = new String[] { BLADE_ATTR_WIND, BLADE_ATTR_ICE, BLADE_ATTR_ICE };
 
-    public static final String[] COMBO_08 = new String[] { BLADE_ATTR_WATER,
-            BLADE_ATTR_WATER, BLADE_ATTR_WATER };
-    public static final String[] COMBO_09 = new String[] { BLADE_ATTR_WATER,
-            BLADE_ATTR_WATER, BLADE_ATTR_DARK };
-    public static final String[] COMBO_10 = new String[] { BLADE_ATTR_WATER,
-            BLADE_ATTR_EARTH, BLADE_ATTR_WIND };
+    public static final String[] COMBO_08 = new String[] { BLADE_ATTR_WATER, BLADE_ATTR_WATER, BLADE_ATTR_WATER };
+    public static final String[] COMBO_09 = new String[] { BLADE_ATTR_WATER, BLADE_ATTR_WATER, BLADE_ATTR_DARK };
+    public static final String[] COMBO_10 = new String[] { BLADE_ATTR_WATER, BLADE_ATTR_EARTH, BLADE_ATTR_WIND };
 
-    public static final String[] COMBO_11 = new String[] { BLADE_ATTR_ICE,
-            BLADE_ATTR_WATER, BLADE_ATTR_WIND };
-    public static final String[] COMBO_12 = new String[] { BLADE_ATTR_ICE,
-            BLADE_ATTR_ICE, BLADE_ATTR_DARK };
-    public static final String[] COMBO_13 = new String[] { BLADE_ATTR_ICE,
-            BLADE_ATTR_ICE, BLADE_ATTR_EARTH };
+    public static final String[] COMBO_11 = new String[] { BLADE_ATTR_ICE, BLADE_ATTR_WATER, BLADE_ATTR_WIND };
+    public static final String[] COMBO_12 = new String[] { BLADE_ATTR_ICE, BLADE_ATTR_ICE, BLADE_ATTR_DARK };
+    public static final String[] COMBO_13 = new String[] { BLADE_ATTR_ICE, BLADE_ATTR_ICE, BLADE_ATTR_EARTH };
 
-    public static final String[] COMBO_14 = new String[] { BLADE_ATTR_EARTH,
-            BLADE_ATTR_FIRE, BLADE_ATTR_WIND };
-    public static final String[] COMBO_15 = new String[] { BLADE_ATTR_EARTH,
-            BLADE_ATTR_FIRE, BLADE_ATTR_EARTH };
-    public static final String[] COMBO_16 = new String[] { BLADE_ATTR_EARTH,
-            BLADE_ATTR_EARTH, BLADE_ATTR_THUNDER };
+    public static final String[] COMBO_14 = new String[] { BLADE_ATTR_EARTH, BLADE_ATTR_FIRE, BLADE_ATTR_WIND };
+    public static final String[] COMBO_15 = new String[] { BLADE_ATTR_EARTH, BLADE_ATTR_FIRE, BLADE_ATTR_EARTH };
+    public static final String[] COMBO_16 = new String[] { BLADE_ATTR_EARTH, BLADE_ATTR_EARTH, BLADE_ATTR_THUNDER };
 
-    public static final String[] COMBO_17 = new String[] { BLADE_ATTR_DARK,
-            BLADE_ATTR_LIGHT, BLADE_ATTR_THUNDER };
-    public static final String[] COMBO_18 = new String[] { BLADE_ATTR_DARK,
-            BLADE_ATTR_DARK, BLADE_ATTR_EARTH };
-    public static final String[] COMBO_19 = new String[] { BLADE_ATTR_DARK,
-            BLADE_ATTR_DARK, BLADE_ATTR_DARK };
+    public static final String[] COMBO_17 = new String[] { BLADE_ATTR_DARK, BLADE_ATTR_LIGHT, BLADE_ATTR_THUNDER };
+    public static final String[] COMBO_18 = new String[] { BLADE_ATTR_DARK, BLADE_ATTR_DARK, BLADE_ATTR_EARTH };
+    public static final String[] COMBO_19 = new String[] { BLADE_ATTR_DARK, BLADE_ATTR_DARK, BLADE_ATTR_DARK };
 
-    public static final String[] COMBO_20 = new String[] { BLADE_ATTR_THUNDER,
-            BLADE_ATTR_FIRE, BLADE_ATTR_WIND };
-    public static final String[] COMBO_21 = new String[] { BLADE_ATTR_THUNDER,
-            BLADE_ATTR_FIRE, BLADE_ATTR_ICE };
-    public static final String[] COMBO_22 = new String[] { BLADE_ATTR_THUNDER,
-            BLADE_ATTR_THUNDER, BLADE_ATTR_WATER };
+    public static final String[] COMBO_20 = new String[] { BLADE_ATTR_THUNDER, BLADE_ATTR_FIRE, BLADE_ATTR_WIND };
+    public static final String[] COMBO_21 = new String[] { BLADE_ATTR_THUNDER, BLADE_ATTR_FIRE, BLADE_ATTR_ICE };
+    public static final String[] COMBO_22 = new String[] { BLADE_ATTR_THUNDER, BLADE_ATTR_THUNDER, BLADE_ATTR_WATER };
 
-    public static final String[] COMBO_23 = new String[] { BLADE_ATTR_LIGHT,
-            BLADE_ATTR_THUNDER, BLADE_ATTR_FIRE };
-    public static final String[] COMBO_24 = new String[] { BLADE_ATTR_LIGHT,
-            BLADE_ATTR_FIRE, BLADE_ATTR_WATER };
-    public static final String[] COMBO_25 = new String[] { BLADE_ATTR_LIGHT,
-            BLADE_ATTR_LIGHT, BLADE_ATTR_LIGHT };
+    public static final String[] COMBO_23 = new String[] { BLADE_ATTR_LIGHT, BLADE_ATTR_THUNDER, BLADE_ATTR_FIRE };
+    public static final String[] COMBO_24 = new String[] { BLADE_ATTR_LIGHT, BLADE_ATTR_FIRE, BLADE_ATTR_WATER };
+    public static final String[] COMBO_25 = new String[] { BLADE_ATTR_LIGHT, BLADE_ATTR_LIGHT, BLADE_ATTR_LIGHT };
 
-    public static final String[][] ALL_COMBO = new String[][] { Code.COMBO_01,
-            Code.COMBO_02, Code.COMBO_03, Code.COMBO_04, Code.COMBO_05,
-            Code.COMBO_06, Code.COMBO_07, Code.COMBO_08, Code.COMBO_09,
-            Code.COMBO_10, Code.COMBO_11, Code.COMBO_12, Code.COMBO_13,
-            Code.COMBO_14, Code.COMBO_15, Code.COMBO_16, Code.COMBO_17,
-            Code.COMBO_18, Code.COMBO_19, Code.COMBO_20, Code.COMBO_21,
+    public static final String[][] ALL_COMBO = new String[][] { Code.COMBO_01, Code.COMBO_02, Code.COMBO_03, Code.COMBO_04, Code.COMBO_05, Code.COMBO_06, Code.COMBO_07, Code.COMBO_08, Code.COMBO_09,
+            Code.COMBO_10, Code.COMBO_11, Code.COMBO_12, Code.COMBO_13, Code.COMBO_14, Code.COMBO_15, Code.COMBO_16, Code.COMBO_17, Code.COMBO_18, Code.COMBO_19, Code.COMBO_20, Code.COMBO_21,
             Code.COMBO_22, Code.COMBO_23, Code.COMBO_24, Code.COMBO_25 };
 
-    public static final String[] ALL_ATTR = new String[] { BLADE_ATTR_FIRE,
-            BLADE_ATTR_LIGHT, BLADE_ATTR_WATER, BLADE_ATTR_THUNDER,
-            BLADE_ATTR_WIND, BLADE_ATTR_ICE, BLADE_ATTR_DARK,
+    public static final String[] ALL_ATTR = new String[] { BLADE_ATTR_FIRE, BLADE_ATTR_LIGHT, BLADE_ATTR_WATER, BLADE_ATTR_THUNDER, BLADE_ATTR_WIND, BLADE_ATTR_ICE, BLADE_ATTR_DARK,
             BLADE_ATTR_EARTH };
 
     public static String getComboCd(String[] combo, int index) {

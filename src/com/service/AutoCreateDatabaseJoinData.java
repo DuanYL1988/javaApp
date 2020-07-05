@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.exception.LocalException;
 import com.pojo.Field;
 import com.pojo.Table;
 import com.util.FileTextUtil;
@@ -39,14 +40,13 @@ public class AutoCreateDatabaseJoinData {
     /* Properties util */
     Properties prop;
     /* Program location */
-    private final String path;
+    private final String path = FileUtils.getPath();
     /* Folder existed ddl file list */
-    private final File[] tableDDL;
-
+    private final File[] tableDDL = new File(path + "//ddl").listFiles();;
     /*  */
     private List<String> joinRealtionText = new ArrayList<String>();
     /* */
-    private final Map<String,Table> tableMap = new HashMap<String, Table>();
+    private final Map<String, Table> tableMap = new HashMap<String, Table>();
     /* */
     Table preTable = null;
 
@@ -54,9 +54,6 @@ public class AutoCreateDatabaseJoinData {
      * Build method
      */
     public AutoCreateDatabaseJoinData() {
-        // Read File To Get Field Info
-        path = fileUtil.getPath();
-        tableDDL = new File(path+"//ddl").listFiles();
         // Get Properties
         try {
             FileReader reader = new FileReader(path + "//" + PROP_FILE);
@@ -92,11 +89,12 @@ public class AutoCreateDatabaseJoinData {
             } else if (textLine.indexOf("LEFT JOIN") >= 0) {
                 // Create Join table insert query
                 getDBColInfo(textLine.split(" ")[2]);
-            } else if (textLine.indexOf("ON") >= 0 || textLine.indexOf("AND")>=0) {
+            } else if (textLine.indexOf("ON") >= 0 || textLine.indexOf("AND") >= 0) {
                 // Get join column value on join part
                 setTblLink(textLine);
             } else if (textLine.indexOf("WHERE") >= 0) {
-                // after where part get column value without join keywords[AND ON]
+                // after where part get column value without join keywords[AND
+                // ON]
                 whereFlag = true;
             } else if (whereFlag && textLine.indexOf(" = ") >= 0) {
                 // after where part
@@ -106,7 +104,12 @@ public class AutoCreateDatabaseJoinData {
             }
             index++;
         }
-        doServic();
+        try {
+            doServic();
+            System.out.println("SUCCESS END");
+        } catch (LocalException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -114,38 +117,41 @@ public class AutoCreateDatabaseJoinData {
      * @param sqlLine
      */
     private void setTblLink(String sqlLine) {
-        sqlLine = (sqlLine.indexOf("ON")==0) ? sqlLine.substring(3) : sqlLine;
-        sqlLine = (sqlLine.indexOf("AND")==0) ? sqlLine.substring(4) : sqlLine;
+        sqlLine = (sqlLine.indexOf("ON") == 0) ? sqlLine.substring(3) : sqlLine;
+        sqlLine = (sqlLine.indexOf("AND") == 0) ? sqlLine.substring(4) : sqlLine;
         String[] linkpt = sqlLine.split("=");
         String tbl1 = linkpt[0].split("\\.")[0].trim();
         String col1 = linkpt[0].split("\\.")[1].trim();
         Table leftTable = tableMap.get(tbl1);
         // when condition is fixed
-        if (linkpt[1].indexOf(".")<0) {
+        if (linkpt[1].indexOf(".") < 0) {
             leftTable.getFieldMap().get(col1).setValue(linkpt[1].trim());
-            tableMap.put(tbl1,leftTable);
+            tableMap.put(tbl1, leftTable);
         } else {
             String value = leftTable.getFieldMap().get(col1).getValue();
             String tbl2 = linkpt[1].split("\\.")[0].trim();
             String col2 = linkpt[1].split("\\.")[1].trim();
             Table rightTable = tableMap.get(tbl2);
             rightTable.getFieldMap().get(col2).setValue(value);
-            tableMap.put(tbl2,rightTable);
+            tableMap.put(tbl2, rightTable);
         }
     }
 
-    private void doServic() {
+    private void doServic() throws LocalException {
         String mode = prop.getProperty("OUTPUT", "SQL");
         Set<String> keys = tableMap.keySet();
-        for (String key : keys ) {
+        for (String key : keys) {
 
             if ("SQL".equals(mode)) {
+
                 createInsertQuery(tableMap.get(key));
             } else if ("CSV".equals(mode)) {
+
                 createCsv(tableMap.get(key));
             }
         }
     }
+
     /**
      * Loop ddl files to get info by table name
      *
@@ -189,7 +195,7 @@ public class AutoCreateDatabaseJoinData {
                 if (i == 0) {
                     csv.append("\"" + field.getDbNm() + "\"");
                 } else {
-                    csv.append(textUtil.setValueByType(field, prop, i , colIndex));
+                    csv.append(textUtil.setValueByType(field, prop, i, colIndex));
                 }
                 if (colIndex < fields.size() - 1) {
                     csv.append(",");
@@ -207,8 +213,10 @@ public class AutoCreateDatabaseJoinData {
      * INSERT PROCESS
      *
      * @param tableNm
+     * @throws LocalException
      */
-    private void createInsertQuery(Table table) {
+    private void createInsertQuery(Table table) throws LocalException {
+
         // Loop Table DDL Files
         List<Field> fields = table.getFieldList();
         String tableNm = table.getName();
@@ -228,8 +236,9 @@ public class AutoCreateDatabaseJoinData {
      * @param tableNm
      * @param fields
      * @return
+     * @throws LocalException
      */
-    private String insertCreater(String tableNm, List<Field> fields) {
+    private String insertCreater(String tableNm, List<Field> fields) throws LocalException {
 
         // Insert count
         int insertCount = Integer.parseInt((String) prop.get(tableNm));
@@ -248,11 +257,7 @@ public class AutoCreateDatabaseJoinData {
             for (Field field : fields) {
                 insertColpart.append(field.getDbNm());
 
-                // Set fixed colunm value
-                String value = "";
-
-                value = textUtil.setValueByType(field,prop,currIdx,colIndex);
-
+                String value = textUtil.setValueByType(field, prop, currIdx, colIndex);
                 insertValpart.append(value);
 
                 if (colIndex < fields.size() - 1) {
@@ -265,21 +270,36 @@ public class AutoCreateDatabaseJoinData {
             result.append(insertColpart);
             // insert excute
             if ("1".equals(excute)) {
+                checkBefInsert(tableNm);
                 excuteQuery.append(insertColpart);
                 String txt = prop.getProperty("INSERT_LIMIT");
                 int limit = StringUtils.isNotEmpty(txt) ? Integer.parseInt(txt) : 5000;
-                if (currIdx%limit == 0) {
+                if (currIdx % limit == 0) {
                     // jdbc
-                    jdbcUtil.insertIntoDB(excuteQuery.toString());
+                    jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
                     excuteQuery = new StringBuilder("");
                 }
             }
         }
         // insert remainder
-         if (excuteQuery.toString().length()>0 && "1".equals(excute)) {
-             jdbcUtil.insertIntoDB(excuteQuery.toString());
-         }
+        if (excuteQuery.toString().length() > 0 && "1".equals(excute)) {
+            jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
+        }
         return result.toString();
     }
 
+    private void checkBefInsert(String tableNm) throws LocalException {
+
+        String updUserCd = prop.getProperty("USER_CD");
+        if (StringUtils.isEmpty(updUserCd)) {
+            throw new LocalException("user code not set yet,please ");
+        }
+
+        StringBuilder where = new StringBuilder(" WHERE ");
+        where.append(" RECODE_USER_CD = '" + updUserCd + "'");
+        StringBuilder delete = new StringBuilder("DELETE FROM " + tableNm);
+        delete.append(where.toString());
+
+        jdbcUtil.excuteInsUpdDel(delete.toString());
+    }
 }

@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.common.Code;
@@ -16,10 +20,10 @@ public class JDBCUtil {
     private static String USERNAME = "";
     private static String PASSWORD = "";
 
-    private final SecurityUtil security;
+    private Connection conn;
+    private Statement st;
 
     public JDBCUtil(Properties prop) {
-        security = new SecurityUtil();
         prop.getProperty(Code.DB_DRIVER);
         DRIVE_CLASS = prop.getProperty(Code.DB_DRIVER);
         URL = prop.getProperty(Code.DB_URL);
@@ -33,122 +37,151 @@ public class JDBCUtil {
         }
     }
 
-    public JDBCUtil() {
-        security = new SecurityUtil();
-        PropertyUtil propUtil = new PropertyUtil();
-
-        DRIVE_CLASS = propUtil.getParamByKey(Code.DB_DRIVER, null, Code.MODE_PARAM);
-        URL = propUtil.getParamByKey(Code.DB_URL, null, Code.MODE_PARAM);
-        USERNAME = propUtil.getParamByKey(Code.DB_USER, null, Code.MODE_PARAM);
-        PASSWORD = propUtil.getParamByKey(Code.DB_PASSWORD, null, Code.MODE_PARAM);
-
-        try {
-            Class.forName(DRIVE_CLASS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String dbConnection(String website, String account, boolean bank_kbn) {
-        String resultText = "";
-        StringBuffer sql = new StringBuffer("select * from PASSWORD_MANAGE where ");
-        // 选卡号加密的情况下，对输入的卡号进行加密验证
-        if (bank_kbn && TextUtil.isNotEmpty(account)) {
-            account = security.enCrypt(account);
-        }
-        if (null != website && !"".equals(website)) {
-            sql.append("WEBSITE LIKE '%" + website + "%' and ");
-        }
-        if (null != account && !"".equals(account)) {
-            sql.append("USER_NAME = '" + account + "' and ");
-        }
-        sql.append(" 1 = 1");
-        System.out.println(sql.toString());
-        ResultSet result = executeQuary(sql.toString());
+    public String excuteSelectOneCol(String query) {
+        ResultSet result = excuteQuery(query);
+        String rst = "";
         try {
             while (result.next()) {
-                resultText = resultText + "注册网站:" + result.getString("WEBSITE") + "\n";
-                // 未选卡号加密的情况下，不对卡号进行解密
-                String db_account = result.getString("USER_NAME");
-                if (!bank_kbn) {
-                    resultText = resultText + "账户名   :" + db_account + "\n";
-                } else {
-                    resultText = resultText + "账户名   :" + security.deCrypt(db_account) + "\n";
-                }
-                String pswd = security.deCrypt(result.getString("USER_PSWD"));
-                resultText = resultText + "解密密码:" + pswd + "\n\n";
+                rst = result.getString(1);
             }
         } catch (SQLException e) {
-            resultText = Code.MSG_SELECT_ERROE;
             e.printStackTrace();
-            return resultText;
+        } finally {
+            closeConnection();
         }
-        return resultText;
+        return rst;
     }
 
-    public String updateDb(String websit, String account, String pswd) {
-        StringBuffer sql = new StringBuffer("INSERT INTO PASSWORD_MANAGE(USER_NAME,USER_PSWD,WEBSITE) VALUES(");
-        sql.append(paramFormat(account) + ",");
-        sql.append(paramFormat(pswd) + ",");
-        sql.append(paramFormat(websit) + ");");
-        System.out.println(sql.toString());
-        String resultText = Code.MSG_UPDATE_SUCCESS;
+    /**
+     * Get result list
+     */
+    public List<Map<String, String>> excuteSelectList(String query) {
+        ResultSet result = excuteQuery(query);
+        String[] cols = getColumns(result);
+        List<Map<String, String>> rst = new ArrayList<Map<String, String>>();
         try {
-            insertIntoDB(sql.toString());
-            resultText = resultText + "\n 账号:" + account;
-            resultText = resultText + "\n 密码:" + pswd;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Code.MSG_SELECT_ERROE;
-        }
-        return resultText;
-    }
-
-    public ResultSet executeQuary(String sql) {
-        ResultSet result = null;
-        try {
-            Connection conn = getConnection();
-            Statement st = conn.createStatement();
-            result = st.executeQuery(sql);
+            while (result.next()) {
+                Map<String, String> values = new HashMap<String, String>();
+                for (int i = 1; i <= cols.length; i++) {
+                    // 字段属性
+                    String key = result.getMetaData().getColumnName(i);
+                    String val = "";
+                    // 取得字段值
+                    val = result.getString(i);
+                    // 控制台输出结果
+                    System.out.print(val + Code.TAB);
+                    // Map<数据库字段名,单元格值>
+                    values.put(key, val);
+                }
+                // 换行
+                System.out.println();
+                // [<col1,val>,<col2,val>]这样存放检索出的数据
+                rst.add(values);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+        return rst;
+    }
+
+    public Boolean excuteInsUpdDel(String sql) {
+        getStatement();
+        Boolean result = null;
+        try {
+            System.out.println(sql);
+            result = st.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("-> Excute SQL Error!");
+            e.printStackTrace();
+        }
+        closeConnection();
+        return result;
+    }
+
+    private ResultSet excuteQuery(String query) {
+        getStatement();
+        ResultSet result = null;
+        try {
+            System.out.println(query);
+            result = st.executeQuery(query);
+            System.out.println("-> Excute SQL SUCCESS!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("-> Excute SQL Error!");
+            System.out.println("-> SQL : " + query);
         }
         return result;
     }
 
-    public void insertIntoDB(String sql) {
-        Connection conn = getConnection();
-        Statement st = null;
+    private void getStatement() {
+        getConnection();
         try {
             st = conn.createStatement();
-            st.execute(sql);
-            closeConnection(st, conn);
+            System.out.println("-> Create Statement SUCCESS");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("-> Create Statement Error!");
         }
     }
 
-    private Connection getConnection() {
-        Connection conn = null;
+    /**
+     * Get Database Connection
+     */
+    private void getConnection() {
         try {
+            System.out.println("-> CONNECT TO DATABASE");
+            Class.forName(DRIVE_CLASS);
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("-> Get Connection Error!");
+        } catch (ClassNotFoundException e) {
+            System.out.println("-> Load Oracle Driver Error!");
         }
-        return conn;
     }
 
-    private void closeConnection(Statement st, Connection conn) {
+    /**
+     * Close DB Connection
+     */
+    private void closeConnection() {
         try {
-            st.close();
-            conn.close();
+            if (null != st) {
+                st.close();
+            }
+            if (null != conn) {
+                conn.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private String paramFormat(String param) {
-        return "'" + param + "'";
+    /**
+     * Get Select Columns
+     *
+     * @param query
+     * @return
+     */
+    private String[] getColumns(ResultSet result) {
+        String[] cols = null;
+        try {
+            // 取得SQL结果列数
+            int colCount = result.getMetaData().getColumnCount();
+            cols = new String[colCount];
+            for (int i = 0; i < colCount; i++) {
+                // 取得列名
+                cols[i] = result.getMetaData().getColumnName(i + 1);
+            }
+        } catch (SQLException e) {
+            System.out.println("->ResultSet.getColumnName Error!!");
+        }
+        if (null!=cols) {
+            for (String col : cols) {
+                System.out.print(col + Code.TAB);
+            }
+        }
+        System.out.println("\r" + "---------------------------------------------------");
+        return cols;
     }
 
 }

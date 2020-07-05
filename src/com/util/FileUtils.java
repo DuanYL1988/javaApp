@@ -98,7 +98,6 @@ public class FileUtils {
      * @param bw
      */
     public void writeFileAndPrintConsole(String txt, BufferedWriter bw) {
-        System.out.println(txt);
         try {
             bw.write(txt + "\r\n");
         } catch (IOException e) {
@@ -133,7 +132,7 @@ public class FileUtils {
      *
      * @return
      */
-    public String getPath() {
+    public static String getPath() {
         File localFile = new File("");
         return localFile.getAbsolutePath();
     }

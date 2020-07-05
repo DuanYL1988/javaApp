@@ -39,16 +39,18 @@ public class FileTextUtil {
             String value =field.getValue();
             if("RECODE_USER_CD".equals(field.getDbNm().toUpperCase())) {
                 // get update user code
-                value = prop.getProperty("USER_CD","Duan Yl");
+                result = prop.getProperty("USER_CD","Duan Yl");
+                return "'" + result + "'";
             } else if ("RECODE_DATE".equals(field.getDbNm().toUpperCase())) {
                 // get update date
-                value = prop.getProperty("UPDATE_DATE","Duan Yl");
-                value = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
+                result = prop.getProperty("UPDATE_DATE","2020/01/01");
+                result = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
+                return "'" + result + "'";
             } else if (StringUtils.isEmpty(value)) {
                 value = setFillText("ITEM**", "*", "0", String.valueOf(colIndex),field.getSize());
                 value = value+"_***";
-                result = setFillText(value, "*", "0", String.valueOf(currIdx),field.getSize());
             }
+            result = setFillText(value, "*", "0", String.valueOf(currIdx),field.getSize());
             return "'" + result + "'";
         } else if (Arrays.asList(DB_NUMBER_TYPE).contains(type)) {
             return currIdx + "";
