@@ -217,7 +217,7 @@ public class AutoCreateDatabaseJoinData {
             }
             csv.append("\r\n");
         }
-        BufferedWriter bw = fileUtil.getWriter(path + "//" + "INSERT_" + tableNm + ".csv");
+        BufferedWriter bw = fileUtil.getWriter(path + "//" + "ZZ_CSV" + tableNm + ".csv");
         fileUtil.writeFileAndPrintConsole(csv.toString(), bw);
         fileUtil.closeWriteSteam(bw);
     }
@@ -237,7 +237,7 @@ public class AutoCreateDatabaseJoinData {
             return;
         String query = insertCreater(tableNm, fields);
 
-        BufferedWriter bw = fileUtil.getWriter(path + "//" + "99_RST_" + tableNm + ".sql");
+        BufferedWriter bw = fileUtil.getWriter(path + "//" + "ZZ_SQL_" + tableNm + ".sql");
         fileUtil.writeFileAndPrintConsole(query, bw);
         fileUtil.closeWriteSteam(bw);
     }

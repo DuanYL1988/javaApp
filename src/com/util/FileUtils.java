@@ -185,9 +185,10 @@ public class FileUtils {
             field.setDbNm(dbNm);
             field.setJavaNm(changeNm(dbNm, false));
             String type = lineInfo[1];
-            if (type.indexOf("(")>=0) {
-                type = lineInfo[1].substring(0, lineInfo[1].indexOf("("));
-                field.setSize(Integer.parseInt(lineInfo[1].substring(lineInfo[1].indexOf("(")+1, lineInfo[1].indexOf(")"))));
+            type = ("character".equals(type)) ? type+" "+lineInfo[2] : type;
+            if (type.indexOf("(")>0) {
+                type = type.substring(0, type.indexOf("("));
+                field.setSize(Integer.parseInt(type.substring(type.indexOf("(")+1, type.indexOf(")"))));
             }
             field.setDbType(type);
             field.setJavaType(changeType(type, "1"));
@@ -207,6 +208,8 @@ public class FileUtils {
      */
     public String changeNm(String dbNm, boolean upFlag) {
         String javaNm = "";
+        // 防止全是小写
+        dbNm = dbNm.toUpperCase();
         String[] nms = dbNm.split("_");
         if (nms.length == 1) {
             javaNm = dbNm.toLowerCase();
