@@ -80,19 +80,17 @@ public class JDBCUtil {
         try {
             while (result.next()) {
                 Map<String, String> values = new HashMap<String, String>();
+                String val = "";
                 for (int i = 1; i <= cols.length; i++) {
                     // 字段属性
                     String key = result.getMetaData().getColumnName(i);
-                    String val = "";
+                    String value = result.getString(i);
                     // 取得字段值
-                    val = result.getString(i);
-                    // 控制台输出结果
-                    System.out.print(val + Code.TAB);
+                    val += value + Code.TAB;
                     // Map<数据库字段名,单元格值>
-                    values.put(key, val);
+                    values.put(key, value);
                 }
-                // 换行
-                System.out.println();
+                System.out.println(val);
                 // [<col1,val>,<col2,val>]这样存放检索出的数据
                 rst.add(values);
             }
@@ -195,12 +193,22 @@ public class JDBCUtil {
             logger.error("->ResultSet.getColumnName Error!!");
         }
         if (null!=cols) {
+            String rst = "";
             for (String col : cols) {
-                System.out.print(col + Code.TAB);
+                rst += getStringLength(col);
+                System.out.print(col + Code.TAB +"|");
             }
+            System.out.println("\r" +rst);
         }
-        System.out.println("\r" + "---------------------------------------------------");
         return cols;
     }
 
+    private String getStringLength(String text) {
+        String rst = "";
+        for(int i=0;i<text.length();i++) {
+            rst += "--";
+        }
+        rst += "----|";
+        return rst;
+    }
 }

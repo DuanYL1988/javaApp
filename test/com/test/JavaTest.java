@@ -28,8 +28,10 @@ public class JavaTest {
 
         JDBCUtil jdbcUtil = new JDBCUtil(prop);
 
-        String query = "delete from hero where id > 0";
-        jdbcUtil.excuteInsUpdDel(query);
+//        String query = "delete from hero where id > 0";
+//        jdbcUtil.excuteInsUpdDel(query);
+        String query = "select * from hero";
+        jdbcUtil.excuteSelectList(query);
     }
 
 

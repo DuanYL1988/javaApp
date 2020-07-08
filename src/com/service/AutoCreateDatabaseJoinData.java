@@ -79,7 +79,6 @@ public class AutoCreateDatabaseJoinData {
 
     public static void main(String[] args) {
         AutoCreateDatabaseJoinData dataCreater = new AutoCreateDatabaseJoinData();
-
         dataCreater.analyzeRelation();
     }
 
@@ -92,6 +91,10 @@ public class AutoCreateDatabaseJoinData {
         try {
             doServic();
             logger.info("処理正常終了");
+            if (null != selectQuery) {
+                logger.info("設定されたSQLで実行結果は下記です");
+                jdbcUtil.excuteSelectList(selectQuery);
+            }
         } catch (LocalException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -122,13 +125,13 @@ public class AutoCreateDatabaseJoinData {
                 getDBColInfo(textLine.split(" ")[2]);
             } else if (textLine.indexOf("ON") >= 0 || textLine.indexOf("AND") >= 0) {
                 // Get join column value on join part
-                setTblLink(textLine);
+                getTblLink(textLine);
             } else if (textLine.indexOf("WHERE") >= 0) {
                 // after where part get column value without join keywords[AND ON]
                 whereFlag = true;
             } else if (whereFlag && textLine.indexOf(" = ") >= 0) {
                 // after where part
-                setTblLink(textLine);
+                getTblLink(textLine);
             } else {
                 getDBColInfo(textLine);
             }
@@ -138,48 +141,6 @@ public class AutoCreateDatabaseJoinData {
         }
     }
 
-    /**
-     *
-     * @param sqlLine
-     */
-    private void setTblLink(String sqlLine) {
-        sqlLine = (sqlLine.indexOf("ON") == 0) ? sqlLine.substring(3) : sqlLine;
-        sqlLine = (sqlLine.indexOf("AND") == 0) ? sqlLine.substring(4) : sqlLine;
-        String[] linkpt = sqlLine.split("=");
-        String tbl1 = linkpt[0].split("\\.")[0].trim();
-        String col1 = linkpt[0].split("\\.")[1].trim();
-        Table leftTable = tableMap.get(tbl1);
-        // when condition is fixed
-        if (linkpt[1].indexOf(".") < 0) {
-            leftTable.getFieldMap().get(col1).setValue(linkpt[1].trim());
-            tableMap.put(tbl1, leftTable);
-        } else {
-            String value = leftTable.getFieldMap().get(col1).getValue();
-            String tbl2 = linkpt[1].split("\\.")[0].trim();
-            String col2 = linkpt[1].split("\\.")[1].trim();
-            Table rightTable = tableMap.get(tbl2);
-            rightTable.getFieldMap().get(col2).setValue(value);
-            tableMap.put(tbl2, rightTable);
-        }
-    }
-
-    private void doServic() throws LocalException {
-        String mode = prop.getProperty("OUTPUT", "SQL");
-        Set<String> keys = tableMap.keySet();
-        if ("SQL".equals(mode)) {
-            logger.info("Insertファイル出力開始");
-            for (String key : keys) {
-                createInsertQuery(tableMap.get(key));
-            }
-            logger.info("Insertファイル出力終了");
-        } else if ("CSV".equals(mode)) {
-            logger.info("CSVファイル出力開始");
-            for (String key : keys) {
-                createCsv(tableMap.get(key));
-            }
-            logger.info("CSVファイル出力終了");
-        }
-    }
 
     /**
      * Loop ddl files to get info by table name
@@ -210,6 +171,50 @@ public class AutoCreateDatabaseJoinData {
                 // get table put into map
                 tableMap.put(tableNm, table);
             }
+        }
+    }
+
+    /**
+     *
+     * @param sqlLine
+     */
+    private void getTblLink(String sqlLine) {
+        sqlLine = (sqlLine.indexOf("ON") == 0) ? sqlLine.substring(3) : sqlLine;
+        sqlLine = (sqlLine.indexOf("AND") == 0) ? sqlLine.substring(4) : sqlLine;
+        String[] linkpt = sqlLine.split("=");
+        String tbl1 = linkpt[0].split("\\.")[0].trim();
+        String col1 = linkpt[0].split("\\.")[1].trim();
+        Table leftTable = getTableWithNm(tbl1);
+        // when table name is alias
+        // when condition is fixed
+        if (linkpt[1].indexOf(".") < 0) {
+            leftTable.getFieldMap().get(col1).setValue(linkpt[1].trim());
+            tableMap.put(tbl1, leftTable);
+        } else {
+            String value = leftTable.getFieldMap().get(col1).getValue();
+            String tbl2 = linkpt[1].split("\\.")[0].trim();
+            String col2 = linkpt[1].split("\\.")[1].trim();
+            Table rightTable = getTableWithNm(tbl2);
+            rightTable.getFieldMap().get(col2).setValue(value);
+            tableMap.put(tbl2, rightTable);
+        }
+    }
+
+    private void doServic() throws LocalException {
+        String mode = prop.getProperty("OUTPUT", "SQL");
+        Set<String> keys = tableMap.keySet();
+        if ("SQL".equals(mode)) {
+            logger.info("Insertファイル出力開始");
+            for (String key : keys) {
+                createInsertQuery(tableMap.get(key));
+            }
+            logger.info("Insertファイル出力終了");
+        } else if ("CSV".equals(mode)) {
+            logger.info("CSVファイル出力開始");
+            for (String key : keys) {
+                createCsv(tableMap.get(key));
+            }
+            logger.info("CSVファイル出力終了");
         }
     }
 
@@ -353,5 +358,18 @@ public class AutoCreateDatabaseJoinData {
         jdbcUtil.excuteInsUpdDel(delete.toString());
     }
 
-
+    /**
+     * Get table object with table name or alias name
+     *
+     * @param tableNm
+     * @return
+     */
+    private Table getTableWithNm(String tableNm) {
+        Table table = this.tableMap.get(tableNm);
+        if (null == table) {
+            tableNm = aliasMap.get("tableNm");
+            table = this.tableMap.get(tableNm);
+        }
+        return table;
+    }
 }
