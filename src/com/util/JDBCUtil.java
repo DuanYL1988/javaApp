@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.common.Code;
+import com.exception.LocalException;
 
 public class JDBCUtil {
 
@@ -45,7 +46,12 @@ public class JDBCUtil {
     }
 
     public String excuteSelectOneCol(String query) {
-        ResultSet result = excuteQuery(query);
+        ResultSet result;
+        try {
+            result = excuteQuery(query);
+        } catch (LocalException e1) {
+            return null;
+        }
         String rst = "";
         try {
             while (result.next()) {
@@ -63,7 +69,12 @@ public class JDBCUtil {
      * Get result list
      */
     public List<Map<String, String>> excuteSelectList(String query) {
-        ResultSet result = excuteQuery(query);
+        ResultSet result=null;
+        try {
+            result = excuteQuery(query);
+        } catch (LocalException e1) {
+            return null;
+        }
         String[] cols = getColumns(result);
         List<Map<String, String>> rst = new ArrayList<Map<String, String>>();
         try {
@@ -93,21 +104,22 @@ public class JDBCUtil {
         return rst;
     }
 
-    public Boolean excuteInsUpdDel(String sql) {
+    public Boolean excuteInsUpdDel(String sql) throws LocalException {
         getStatement();
         Boolean result = null;
         try {
-            logger.info("sql実行する : "+sql);
+            logger.info("-> SQL : "+sql);
             result = st.execute(sql);
         } catch (SQLException e) {
-            logger.error("-> Excute SQL Error!");
-            e.printStackTrace();
+            String msg = StringUtils.createErrorMsg(this.getClass().toString(), "excuteInsUpdDel", "SQL", e.getMessage());
+            logger.error(msg);
+            throw new LocalException();
         }
         closeConnection();
         return result;
     }
 
-    private ResultSet excuteQuery(String query) {
+    private ResultSet excuteQuery(String query) throws LocalException {
         getStatement();
         ResultSet result = null;
         try {
@@ -115,7 +127,9 @@ public class JDBCUtil {
             result = st.executeQuery(query);
             logger.info("-> Excute SQL SUCCESS");
         } catch (SQLException e) {
-            logger.info("-> Excute SQL Error!");
+            String msg = StringUtils.createErrorMsg(this.getClass().toString(), "excuteQuery", "SQL", e.getMessage());
+            logger.error(msg);
+            throw new LocalException();
         }
         return result;
     }

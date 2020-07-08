@@ -1,7 +1,5 @@
 package com.util;
 
-import com.common.Code;
-
 public class TextUtil {
 
     public static boolean isNotEmpty(String text) {
@@ -20,21 +18,14 @@ public class TextUtil {
         return (isNotEmpty(arg1, arg2) && isNotEmpty(arg3));
     }
 
-    public static void debugLog(StringBuffer log, String param, String text) {
-        log.append(Code.LOGOUTPUT + param + ":" + text);
-    }
-
-    public static String debugLog(String value, String param, String text) {
-        if (null != param) {
-            value = value + Code.LOGOUTPUT + param + ":" + text;
-        } else {
-            value = value + Code.LOGOUTPUT + text;
+    public static boolean arrayContains(String value,String[] array) {
+        boolean existFlag = false;
+        for(String member : array) {
+            if (member.equals(value)) {
+                return true;
+            }
         }
-        return value;
+        return existFlag;
     }
 
-    public static void main(String[] args) {
-        String name = "ON HERO.COLOR";
-        System.out.println(name.substring(2));
-    }
 }

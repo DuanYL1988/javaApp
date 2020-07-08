@@ -13,6 +13,8 @@ public class Table {
 
     private Map<String,Field> fieldMap;
 
+    private String primaryKeys;
+
     public String getName() {
         return name;
     }
@@ -43,6 +45,14 @@ public class Table {
 
     public void setFieldMap(Map<String, Field> fieldMap) {
         this.fieldMap = fieldMap;
+    }
+
+    public String getPrimaryKeys() {
+        return primaryKeys;
+    }
+
+    public void setPrimaryKeys(String primaryKeys) {
+        this.primaryKeys = primaryKeys;
     }
 
 }

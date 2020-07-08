@@ -1,6 +1,5 @@
 package com.util;
 
-import java.util.Arrays;
 import java.util.Properties;
 
 import com.pojo.Field;
@@ -14,9 +13,9 @@ import com.pojo.Field;
 public class FileTextUtil {
 
     /* table text type array */
-    private static final String[] DB_VARCHAR_TYPE = new String[] { "VARCHAR", "VARCHAR2", "CHAR" };
+    private static final String[] DB_VARCHAR_TYPE = new String[] { "VARCHAR", "VARCHAR2", "CHAR","CHARACTER VARYING" };
     /* table number type array */
-    private static final String[] DB_NUMBER_TYPE = new String[] { "NUMBER", "INT", "DECIMAL", "NUMERIC" };
+    private static final String[] DB_NUMBER_TYPE = new String[] { "NUMBER", "INT","BIGINT", "DECIMAL", "NUMERIC" };
     /* table number type array */
     private static final String[] DB_TIME_TYPE = new String[] { "DATE", "TIMESTAMP" };
 
@@ -30,12 +29,13 @@ public class FileTextUtil {
      *            insert during current index currIdx
      * @return insert value
      */
-    public String setValueByType(Field field,Properties prop, int currIdx,int colIndex) {
+    public static String setValueByType(Field field,Properties prop, int currIdx,int colIndex) {
 
         String result = "";
-        String type = field.getDbType();
+        String type = field.getDbType().toUpperCase();
         // text
-        if (Arrays.asList(DB_VARCHAR_TYPE).contains(type)) {
+
+        if (TextUtil.arrayContains(type,DB_VARCHAR_TYPE)) {
             String value =field.getValue();
             if("RECODE_USER_CD".equals(field.getDbNm().toUpperCase())) {
                 // get update user code
@@ -52,9 +52,9 @@ public class FileTextUtil {
             }
             result = setFillText(value, "*", "0", String.valueOf(currIdx),field.getSize());
             return "'" + result + "'";
-        } else if (Arrays.asList(DB_NUMBER_TYPE).contains(type)) {
+        } else if (TextUtil.arrayContains(type,DB_NUMBER_TYPE)) {
             return currIdx + "";
-        } else if (Arrays.asList(DB_TIME_TYPE).contains(type)) {
+        } else if (TextUtil.arrayContains(type,DB_TIME_TYPE)) {
             return "CURRENT_TIMESTAMP";
         }
         return "NULL'";
@@ -63,7 +63,7 @@ public class FileTextUtil {
     /**
      *
      * Auto filling from last<br>
-     * exp : BCD1****,*,0,999,6 → BCD109
+     * EXP : BCD1****,*,0,999,6 → BCD109
      *
      * @param base
      * @param fmtMark
@@ -71,7 +71,7 @@ public class FileTextUtil {
      * @param fillChar
      * @return
      */
-    public String setFillText(String base, String fmtMark, String repChar, String fillChar,int maxLength) {
+    public static String setFillText(String base, String fmtMark, String repChar, String fillChar,int maxLength) {
         String result = base;
         // get formt part width
         int width = base.lastIndexOf(fmtMark) - (base.indexOf(fmtMark) - 1);
@@ -97,10 +97,4 @@ public class FileTextUtil {
         return result;
     }
 
-    public static void main(String[] args) {
-        FileTextUtil thisclass = new FileTextUtil();
-//        String rst = thisclass.setFillText("BCD1****", "*", "0", "999",6);
-        String rst = thisclass.setFillText("w", "*", "0", "1",2);
-        System.out.println(rst);
-    }
 }

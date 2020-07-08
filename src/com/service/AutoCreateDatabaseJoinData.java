@@ -35,10 +35,6 @@ public class AutoCreateDatabaseJoinData {
     /* table join relation info */
     private static final String JOIN_FILE = "tableJoinInfo.txt";
 
-    /* File util */
-    FileUtils fileUtil = new FileUtils();
-    /* Text util */
-    FileTextUtil textUtil = new FileTextUtil();
     /* Text util */
     JDBCUtil jdbcUtil;
 
@@ -52,8 +48,12 @@ public class AutoCreateDatabaseJoinData {
     private List<String> joinRealtionText = new ArrayList<String>();
     /* */
     private final Map<String, Table> tableMap = new HashMap<String, Table>();
+    /** table alias map <br>EXP:[hm:HERO_MASTER] */
+    private final Map<String, String> aliasMap = new HashMap<String, String>();
     /* */
     Table preTable = null;
+    /* */
+    String selectQuery = null;
 
     Logger logger = null;
 
@@ -74,7 +74,7 @@ public class AutoCreateDatabaseJoinData {
         }
         jdbcUtil = new JDBCUtil(prop);
         // Get Table Relation
-        joinRealtionText = fileUtil.getFileText(new File(path + "//" + JOIN_FILE));
+        joinRealtionText = FileUtils.getFileText(new File(path + "//" + JOIN_FILE));
     }
 
     public static void main(String[] args) {
@@ -87,14 +87,36 @@ public class AutoCreateDatabaseJoinData {
      * GET SETTING RELATION
      */
     private void analyzeRelation() {
-        int index = 0;
+
+        getSelectQueryAndRelation();
+        try {
+            doServic();
+            logger.info("処理正常終了");
+        } catch (LocalException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void getSelectQueryAndRelation() {
+        StringBuilder query = new StringBuilder();
+        boolean selectFlag = false;
         boolean whereFlag = false;
 
         for (String textLine : joinRealtionText) {
+            // Sql select check
+            textLine = StringUtils.removeFirestSpace(textLine);
+            if (textLine.toUpperCase().indexOf("SELECT")>=0) {
+                selectFlag = true;
+            }
+            // is select query and before from
+            if (selectFlag) {
+                query.append(textLine);
+            }
             // Get Master Table Name
-            if (0 == index) {
+            if (textLine.toUpperCase().indexOf("FROM")>=0) {
                 // Create Master Table Insert Query
-                getDBColInfo(textLine.trim());
+                getDBColInfo(textLine.replace("FROM", ""));
             } else if (textLine.indexOf("LEFT JOIN") >= 0) {
                 // Create Join table insert query
                 getDBColInfo(textLine.split(" ")[2]);
@@ -110,14 +132,9 @@ public class AutoCreateDatabaseJoinData {
             } else {
                 getDBColInfo(textLine);
             }
-            index++;
         }
-        try {
-            doServic();
-            logger.info("処理正常終了");
-        } catch (LocalException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
+        if (selectFlag) {
+            selectQuery = query.toString();
         }
     }
 
@@ -170,7 +187,14 @@ public class AutoCreateDatabaseJoinData {
      * @param tableNm
      * @return
      */
-    private void getDBColInfo(String tableNm) {
+    private void getDBColInfo(String textLine) {
+        textLine = StringUtils.removeFirestSpace(textLine);
+        String[] lineInfo =  textLine.split(" ");
+        String tableNm = lineInfo[0];
+        if (lineInfo.length>1) {
+            // put table alias into map
+            aliasMap.put(lineInfo[1], tableNm);
+        }
         if (null != tableMap.get(tableNm)) {
             return;
         }
@@ -182,7 +206,7 @@ public class AutoCreateDatabaseJoinData {
             // While Table DDL existed
             if (tblNm.equals(tableNm)) {
                 logger.info(tableNm+"テーブルカラム情報取得");
-                Table table = fileUtil.getFieldListFromDDL(file);
+                Table table = FileUtils.getFieldListFromDDL(file);
                 // get table put into map
                 tableMap.put(tableNm, table);
             }
@@ -208,7 +232,7 @@ public class AutoCreateDatabaseJoinData {
                 if (i == 0) {
                     csv.append("\"" + field.getDbNm() + "\"");
                 } else {
-                    csv.append(textUtil.setValueByType(field, prop, i, colIndex));
+                    csv.append(FileTextUtil.setValueByType(field, prop, i, colIndex));
                 }
                 if (colIndex < fields.size() - 1) {
                     csv.append(",");
@@ -217,9 +241,9 @@ public class AutoCreateDatabaseJoinData {
             }
             csv.append("\r\n");
         }
-        BufferedWriter bw = fileUtil.getWriter(path + "//" + "ZZ_CSV" + tableNm + ".csv");
-        fileUtil.writeFileAndPrintConsole(csv.toString(), bw);
-        fileUtil.closeWriteSteam(bw);
+        BufferedWriter bw = FileUtils.getWriter(path + "//" + "ZZ_CSV" + tableNm + ".csv");
+        FileUtils.writeFileAndPrintConsole(csv.toString(), bw);
+        FileUtils.closeWriteSteam(bw);
     }
 
     /**
@@ -237,9 +261,9 @@ public class AutoCreateDatabaseJoinData {
             return;
         String query = insertCreater(tableNm, fields);
 
-        BufferedWriter bw = fileUtil.getWriter(path + "//" + "ZZ_SQL_" + tableNm + ".sql");
-        fileUtil.writeFileAndPrintConsole(query, bw);
-        fileUtil.closeWriteSteam(bw);
+        BufferedWriter bw = FileUtils.getWriter(path + "//" + "ZZ_SQL_" + tableNm + ".sql");
+        FileUtils.writeFileAndPrintConsole(query, bw);
+        FileUtils.closeWriteSteam(bw);
     }
 
     /**
@@ -272,7 +296,7 @@ public class AutoCreateDatabaseJoinData {
             for (Field field : fields) {
                 insertColpart.append(field.getDbNm());
 
-                String value = textUtil.setValueByType(field, prop, currIdx, colIndex);
+                String value = FileTextUtil.setValueByType(field, prop, currIdx, colIndex);
                 insertValpart.append(value);
 
                 if (colIndex < fields.size() - 1) {
@@ -289,7 +313,7 @@ public class AutoCreateDatabaseJoinData {
                 String txt = prop.getProperty("INSERT_LIMIT");
                 int limit = StringUtils.isNotEmpty(txt) ? Integer.parseInt(txt) : 1000;
                 if (currIdx % limit == 0) {
-                    // jdbc
+                    // JDBC
                     jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
                     excuteQuery = new StringBuilder("");
                 }
@@ -300,15 +324,21 @@ public class AutoCreateDatabaseJoinData {
             jdbcUtil.excuteInsUpdDel(excuteQuery.toString());
         }
         Date end = new Date();
-        logger.info("実行時間"+DateTimeUtil.getUseTime(start, end)+" ms");
+        logger.info(tableNm+"insert 成功,件数:"+insertCount+",用时: "+DateTimeUtil.getUseTime(start, end)+" ms");
         return result.toString();
     }
 
+    /**
+     * @param tableNm
+     * @param Auto run SQL excute
+     * @throws LocalException
+     */
     private void checkBefInsert(String tableNm,String excute) throws LocalException {
 
         String updUserCd = prop.getProperty("USER_CD");
 
-        if ("0".equals(excute)) {
+        Map<String, Field> fieldMap = tableMap.get(tableNm).getFieldMap();
+        if ("0".equals(excute) || null == fieldMap.get("RECODE_USER_CD") || null == fieldMap.get("recode_user_cd")) {
             return;
         }
         if (StringUtils.isEmpty(updUserCd)) {
@@ -322,4 +352,6 @@ public class AutoCreateDatabaseJoinData {
 
         jdbcUtil.excuteInsUpdDel(delete.toString());
     }
+
+
 }

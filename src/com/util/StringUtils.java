@@ -38,7 +38,19 @@ public class StringUtils {
     }
 
     /**
-     *
+     * Remove space at heard of line
+     * @param line
+     */
+    public static String removeFirestSpace(String line) {
+        // replace first space
+        String firstChar = line.substring(0,1);
+        if(" ".equals(firstChar) || ",".equals(firstChar)) {
+            line = removeFirestSpace(line.substring(1));
+        }
+        return line;
+    }
+
+    /**
      * edit error message
      *
      * @param classNm
@@ -54,7 +66,7 @@ public class StringUtils {
         errorInfo.append("= method  : "+methodNm+"\r\n");
         errorInfo.append("= type       : "+type+"\r\n");
         errorInfo.append("= info       : "+info+"\r\n");
-        errorInfo.append("=========================================");
+        errorInfo.append("========================================="+"\r\n");
         return errorInfo.toString();
     }
 }

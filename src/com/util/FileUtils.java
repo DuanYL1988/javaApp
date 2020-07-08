@@ -24,7 +24,7 @@ public class FileUtils {
      * @param file
      * @return
      */
-    public List<String> getFileText(File file) {
+    public static List<String> getFileText(File file) {
         List<String> fileTxtList = new ArrayList<String>();
         try {
             @SuppressWarnings("resource")
@@ -45,7 +45,7 @@ public class FileUtils {
      * @param file
      * @return
      */
-    public Table getFieldListFromDDL(File file) {
+    public static Table getFieldListFromDDL(File file) {
         Table table = new Table();
         table.setName(file.getName().substring(0,file.getName().indexOf(".")));
         List<Field> fieldList = new ArrayList<Field>();
@@ -55,8 +55,12 @@ public class FileUtils {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = null;
             while (null != (line = br.readLine())) {
-
-                if (");".equals(line)) continue;
+                line = StringUtils.removeFirestSpace(line);
+                if (");".equals(line)) break;
+                if (line.toUpperCase().indexOf("PRIMARY KEY(") >= 0) {
+                    String pk = line.substring(line.indexOf("(")-1,line.indexOf(")"));
+                    table.setPrimaryKeys(pk);
+                }
 
                 Field field = getFieldInfoFromDDL(line);
                 if (null != field) {
@@ -78,7 +82,7 @@ public class FileUtils {
      * @param fullpath
      * @return
      */
-    public BufferedWriter getWriter(String fullpath) {
+    public static BufferedWriter getWriter(String fullpath) {
         File writeFile = new File(fullpath);
         BufferedWriter bw = null;
         try {
@@ -98,7 +102,7 @@ public class FileUtils {
      * @param txt
      * @param bw
      */
-    public void writeFileAndPrintConsole(String txt, BufferedWriter bw) {
+    public static void writeFileAndPrintConsole(String txt, BufferedWriter bw) {
         try {
             bw.write(txt + "\r\n");
         } catch (IOException e) {
@@ -111,7 +115,7 @@ public class FileUtils {
      *
      * @param bw
      */
-    public void closeWriteSteam(BufferedWriter bw) {
+    public static void closeWriteSteam(BufferedWriter bw) {
         try {
             bw.close();
         } catch (IOException e) {
@@ -122,7 +126,7 @@ public class FileUtils {
     /**
      * 生成有内容的文件
      */
-    public void writeFile(String fullpath,String text) {
+    public static void writeFile(String fullpath,String text) {
         BufferedWriter bw = getWriter(fullpath);
         writeFileAndPrintConsole(text, bw);
         closeWriteSteam(bw);
@@ -141,7 +145,7 @@ public class FileUtils {
     /**
      * 数据库类型与java类型匹配
      */
-    public String changeType(String type, String direct) {
+    public static String changeType(String type, String direct) {
         Map<String, String> mapping = new HashMap<String, String>();
         mapping.put("VARCHAR2", "String");
         mapping.put("VARCHA2", "String");
@@ -170,12 +174,12 @@ public class FileUtils {
     }
 
     /**
-     * 从DDL读取数据库表字段信息
+     * Get column information from DDL
      *
      * @param line
      * @return
      */
-    private Field getFieldInfoFromDDL(String line) {
+    private static Field getFieldInfoFromDDL(String line) {
         if (line.toUpperCase().indexOf("CREATE TABLE") >= 0 || line.toUpperCase().indexOf("PRIMARY KEY") >= 0 ) {
             return null;
         } else {
@@ -185,6 +189,7 @@ public class FileUtils {
             field.setDbNm(dbNm);
             field.setJavaNm(changeNm(dbNm, false));
             String type = lineInfo[1];
+            // postgreSql
             type = ("character".equals(type)) ? type+" "+lineInfo[2] : type;
             if (type.indexOf("(")>0) {
                 type = type.substring(0, type.indexOf("("));
@@ -198,15 +203,20 @@ public class FileUtils {
                 loginNm = line.substring(line.indexOf("--")+2);
             }
             field.setValue(loginNm);
-
+            field.setLogicNm(loginNm);
             return field;
         }
     }
 
     /**
-     * 数据库字段名转为java变量名
+     * Change Database column name to java name<br>
+     * EXP : CODE_ID ----codeId
+     *
+     * @param Database column name dbNm
+     * @param Java name first char upper flag upFlag
+     * @return
      */
-    public String changeNm(String dbNm, boolean upFlag) {
+    public static String changeNm(String dbNm, boolean upFlag) {
         String javaNm = "";
         // 防止全是小写
         dbNm = dbNm.toUpperCase();
