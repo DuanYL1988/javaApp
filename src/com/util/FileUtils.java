@@ -192,8 +192,8 @@ public class FileUtils {
             // postgreSql
             type = ("character".equals(type)) ? type+" "+lineInfo[2] : type;
             if (type.indexOf("(")>0) {
-                type = type.substring(0, type.indexOf("("));
                 field.setSize(Integer.parseInt(type.substring(type.indexOf("(")+1, type.indexOf(")"))));
+                type = type.substring(0, type.indexOf("("));
             }
             field.setDbType(type);
             field.setJavaType(changeType(type, "1"));

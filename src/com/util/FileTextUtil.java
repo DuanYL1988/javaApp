@@ -37,15 +37,20 @@ public class FileTextUtil {
 
         if (TextUtil.arrayContains(type,DB_VARCHAR_TYPE)) {
             String value =field.getValue();
-            if("RECODE_USER_CD".equals(field.getDbNm().toUpperCase())) {
+            String dbNm = field.getDbNm().toUpperCase();
+            if(dbNm.indexOf("RECODE_USER_CD")>=0) {
                 // get update user code
                 result = prop.getProperty("USER_CD","Duan Yl");
                 return "'" + result + "'";
-            } else if ("RECODE_DATE".equals(field.getDbNm().toUpperCase())) {
+            } else if (dbNm.indexOf("INSERT_DATE")>=0 || field.getDbNm().toUpperCase().indexOf("RECORD_DATE")>=0) {
                 // get update date
                 result = prop.getProperty("UPDATE_DATE","2020/01/01");
                 result = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
                 return "'" + result + "'";
+            } else if (dbNm.indexOf("IN_STOCK_START_DATE")>=0 ) {
+                return "'2010/01/01|00:00:00'";
+            }  else if (dbNm.indexOf("IN_STOCK_END_DATE")>=0 ) {
+                return "'2999/01/01|00:00:00'";
             } else if (StringUtils.isEmpty(value)) {
                 value = setFillText("ITEM**", "*", "0", String.valueOf(colIndex),field.getSize());
                 value = value+"_***";
