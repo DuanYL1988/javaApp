@@ -18,10 +18,10 @@ public class TextUtil {
         return (isNotEmpty(arg1, arg2) && isNotEmpty(arg3));
     }
 
-    public static boolean arrayContains(String value,String[] array) {
+    public static boolean arrayContains(String value, String[] array) {
         boolean existFlag = false;
-        for(String member : array) {
-            if (member.equals(value)) {
+        for (String member : array) {
+            if (member.toUpperCase().equals(value)) {
                 return true;
             }
         }

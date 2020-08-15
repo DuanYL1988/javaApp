@@ -47,18 +47,19 @@ public class FileUtils {
      */
     public static Table getFieldListFromDDL(File file) {
         Table table = new Table();
-        table.setName(file.getName().substring(0,file.getName().indexOf(".")));
+        table.setName(file.getName().substring(0, file.getName().indexOf(".")));
         List<Field> fieldList = new ArrayList<Field>();
-        Map<String,Field> fieldMap = new HashMap<String, Field>();
+        Map<String, Field> fieldMap = new HashMap<String, Field>();
         try {
             @SuppressWarnings("resource")
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = null;
             while (null != (line = br.readLine())) {
                 line = StringUtils.removeFirestSpace(line);
-                if (");".equals(line)) break;
+                if (");".equals(line))
+                    break;
                 if (line.toUpperCase().indexOf("PRIMARY KEY(") >= 0) {
-                    String pk = line.substring(line.indexOf("(")-1,line.indexOf(")"));
+                    String pk = line.substring(line.indexOf("(") - 1, line.indexOf(")"));
                     table.setPrimaryKeys(pk);
                 }
 
@@ -89,7 +90,7 @@ public class FileUtils {
             if (!writeFile.exists()) {
                 writeFile.createNewFile();
             }
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fullpath)),"utf-8"));
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fullpath)), "utf-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,7 +127,7 @@ public class FileUtils {
     /**
      * 生成有内容的文件
      */
-    public static void writeFile(String fullpath,String text) {
+    public static void writeFile(String fullpath, String text) {
         BufferedWriter bw = getWriter(fullpath);
         writeFileAndPrintConsole(text, bw);
         closeWriteSteam(bw);
@@ -161,11 +162,11 @@ public class FileUtils {
         for (String db : keys) {
             String javaNm = mapping.get(db);
             if ("1".equals(direct)) {
-                if(db.equals(type)) {
+                if (db.equals(type)) {
                     return javaNm;
                 }
             } else {
-                if(javaNm.equals(type)) {
+                if (javaNm.equals(type)) {
                     return db;
                 }
             }
@@ -180,7 +181,7 @@ public class FileUtils {
      * @return
      */
     private static Field getFieldInfoFromDDL(String line) {
-        if (line.toUpperCase().indexOf("CREATE TABLE") >= 0 || line.toUpperCase().indexOf("PRIMARY KEY") >= 0 ) {
+        if (line.toUpperCase().indexOf("CREATE TABLE") >= 0 || line.toUpperCase().indexOf("PRIMARY KEY") >= 0) {
             return null;
         } else {
             Field field = new Field();
@@ -190,17 +191,21 @@ public class FileUtils {
             field.setJavaNm(changeNm(dbNm, false));
             String type = lineInfo[1];
             // postgreSql
-            type = ("character".equals(type)) ? type+" "+lineInfo[2] : type;
-            if (type.indexOf("(")>0) {
-                field.setSize(Integer.parseInt(type.substring(type.indexOf("(")+1, type.indexOf(")"))));
+            type = ("character".equals(type)) ? type + " " + lineInfo[2] : type;
+            if (type.indexOf("(") > 0) {
+                int endInde = type.indexOf(")") > 0 ? type.indexOf(")") : type.indexOf(",");
+                field.setSize(Integer.parseInt(type.substring(type.indexOf("(") + 1, endInde)));
                 type = type.substring(0, type.indexOf("("));
+            }
+            if (null == field.getSize() || 0 == field.getSize()) {
+                field.setSize(35);
             }
             field.setDbType(type);
             field.setJavaType(changeType(type, "1"));
             // set value
             String loginNm = "";
-            if (line.indexOf("--")>0) {
-                loginNm = line.substring(line.indexOf("--")+2);
+            if (line.indexOf("--") > 0) {
+                loginNm = line.substring(line.indexOf("--") + 2);
             }
             field.setValue(loginNm);
             field.setLogicNm(loginNm);
@@ -213,7 +218,7 @@ public class FileUtils {
      * EXP : CODE_ID ----codeId
      *
      * @param Database column name dbNm
-     * @param Java name first char upper flag upFlag
+     * @param Java     name first char upper flag upFlag
      * @return
      */
     public static String changeNm(String dbNm, boolean upFlag) {
