@@ -1,0 +1,8 @@
+/.git/
+/bin/
+/ddl/
+/data.pswd
+/.settings/
+/config.properties
+/target/
+/tableJoinInfo.txt
