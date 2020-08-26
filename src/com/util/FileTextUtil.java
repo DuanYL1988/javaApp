@@ -33,6 +33,8 @@ public class FileTextUtil {
         String type = field.getDbType().toUpperCase();
         String value = field.getValue();
 
+        value = getValueFromArray(value, currIdx);
+
         if (TextUtil.arrayContains(type, DB_VARCHAR_TYPE)) {
             String dbNm = field.getDbNm().toUpperCase();
             if (dbNm.indexOf("RECODE_USER_CD") >= 0) {
@@ -106,4 +108,23 @@ public class FileTextUtil {
         return result;
     }
 
+    private static String getValueFromArray(String textVal,int currentIndex) {
+        String[] arrayVal = textVal.split(",");
+        int index = getIndex(arrayVal.length, currentIndex);
+        return arrayVal[index];
+    }
+
+    private static int getIndex(int max,int current) {
+        if (current>=max) {
+            current = getIndex(max,current-max);
+        }
+        return current;
+    }
+
+    public static void main(String[] args) {
+        String value = "99001,99002";
+        for(int i=0;i<10 ;i++) {
+            System.out.println(getValueFromArray(value, i));
+        }
+    }
 }

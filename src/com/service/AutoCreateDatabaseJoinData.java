@@ -274,7 +274,7 @@ public class AutoCreateDatabaseJoinData {
             return;
         String query = insertCreater(tableNm, fields);
 
-        BufferedWriter bw = FileUtils.getWriter(path + "//" + "ZZ_SQL_" + tableNm + ".sql");
+        BufferedWriter bw = FileUtils.getWriter(path + "//" + tableNm + ".sql");
         FileUtils.writeFileAndPrintConsole(query, bw);
         FileUtils.closeWriteSteam(bw);
     }
