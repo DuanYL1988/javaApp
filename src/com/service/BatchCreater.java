@@ -31,13 +31,19 @@ public class BatchCreater {
     private String shellName;
 
     /* shell Name */
-    private String targetTbl;
+    private String tmpTbl;
 
     /* shell Name */
-    private String targetTblName;
+    private String tmpTblName;
+    
+    /* shell Name */
+    private String originTbl;
+    
+    /* shell Name */
+    private String originTblName;
 
     /* shell Name */
-    private String csvExportKbn;
+    private String csvKbn;
 
     Logger logger = null;
 
@@ -50,9 +56,16 @@ public class BatchCreater {
             prop.load(reader);
             shellId = prop.getProperty("shell_id");
             shellName = prop.getProperty("shell_name");
-            targetTbl = prop.getProperty("target_table");
-            targetTblName = prop.getProperty("target_table_name");
-            csvExportKbn = prop.getProperty("csv_export_kbn");
+            tmpTbl = prop.getProperty("tmp_table");
+            tmpTblName = prop.getProperty("tmp_table_name");
+            originTbl = prop.getProperty("origin_table");
+            originTblName = prop.getProperty("origin_table_name");
+            try {
+                csvKbn = shellId.split("_")[2].substring(0, 2).toUpperCase();
+            } catch (Exception e) {
+                String msg = StringUtils.createErrorMsg(this.getClass().toString(), "BatchCreater", "property", e.getMessage());
+                logger.error(msg);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
             return;
@@ -78,7 +91,7 @@ public class BatchCreater {
 
             StringBuilder shell = new StringBuilder();
             shell.append(formateTemplate("sample.sh"));
-
+            System.out.println(shell.toString());
             FileUtils.writeFileAndPrintConsole(shell.toString(), shWriter);
             FileUtils.closeWriteSteam(shWriter);
         } catch (Exception e) {
@@ -94,8 +107,8 @@ public class BatchCreater {
 
             StringBuilder procedure = new StringBuilder();
             procedure.append(formateTemplate("procedure.sql"));
+            
             FileUtils.writeFileAndPrintConsole(procedure.toString(), procWriter);
-
             FileUtils.closeWriteSteam(procWriter);
         } catch (Exception e) {
             logger.error(StringUtils.createErrorMsg(this.getClass().toString(), "createShell", "java", e.getMessage()));
@@ -104,28 +117,52 @@ public class BatchCreater {
     }
 
     private String formateTemplate(String templateName) {
-        boolean csvKbn = "1".equals(csvExportKbn) ? true : false;
-        boolean csvAreaFlag = false;
+        
+        boolean exAreaFlag = false;
+        boolean ipAreaFlag = false;
         StringBuilder template = new StringBuilder();
         List<String> lines = FileUtils.getFileText(new File(path+ "//" +templateName));
         for (String line : lines) {
             // format
             line = line.replace("#shellId#", shellId);
             line = line.replace("#shellName#", shellName);
-            line = line.replace("#target_table#", targetTbl);
-            line = line.replace("#target_table_name#", targetTblName);
+            line = line.replace("#tmp_table#", tmpTbl);
+            line = line.replace("#tmp_table_name#", tmpTblName);
+            line = line.replace("#origin_table#", originTbl);
+            line = line.replace("#origin_table_name#", originTblName);
 
-            if (line.indexOf("CSV_EXPORT_START")>0) {
-                csvAreaFlag = true;
+            if (line.indexOf("CSV_EXPORT_START") > 0) {
+                exAreaFlag = true;
                 continue;
-            } else if (line.indexOf("CSV_EXPORT_END")>0) {
-                csvAreaFlag = false;
+            } else if (line.indexOf("CSV_EXPORT_END") > 0) {
+                exAreaFlag = false;
                 continue;
-            } else if (csvKbn || (!csvKbn && !csvAreaFlag)) {
-                template.append(line+Code.UNIX_ENTRY);
             }
+            if ("EP".equals(csvKbn) && exAreaFlag) {
+                template.append(line+Code.UNIX_ENTRY);
+                continue;
+            }
+
+            if (line.indexOf("CSV_IMPORT_START") > 0) {
+                ipAreaFlag = true;
+                continue;
+            } else if (line.indexOf("CSV_IMPORT_END") > 0) {
+                ipAreaFlag = false;
+                continue;
+            }
+            if ("IP".equals(csvKbn) && ipAreaFlag) {
+                template.append(line+Code.UNIX_ENTRY);
+                continue;
+            }
+            
+            if (!ipAreaFlag && !exAreaFlag) {
+                template.append(line+Code.UNIX_ENTRY);
+                continue;
+            }
+
         }
         return template.toString();
     }
+
 
 }
