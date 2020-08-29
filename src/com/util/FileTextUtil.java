@@ -37,9 +37,11 @@ public class FileTextUtil {
 
         if (TextUtil.arrayContains(type, DB_VARCHAR_TYPE)) {
             String dbNm = field.getDbNm().toUpperCase();
-            if (dbNm.indexOf("RECODE_USER_CD") >= 0) {
+            if ("null".equals(value.toLowerCase())) {
+                return "NULL";
+            } else if (dbNm.indexOf("RECODE_USER_CD") >= 0) {
                 // get update user code
-                result = prop.getProperty("USER_CD", "Duan Yl");
+                result = "TESTER";
                 return "'" + result + "'";
             } else if (dbNm.indexOf("INSERT_DATE") >= 0 || field.getDbNm().toUpperCase().indexOf("RECORD_DATE") >= 0) {
                 // get update date
@@ -47,11 +49,16 @@ public class FileTextUtil {
                 result = StringUtils.isEmpty(value) ? DateTimeUtil.getCurrentDate(DateTimeUtil.YMD_HMS_POSTGRE) : value;
                 return "'" + result + "'";
             } else if (dbNm.indexOf("START_DATE") >= 0) {
-                return "'2010/01/01|00:00:00'";
+                value = StringUtils.isEmpty(value) ? "2010/01/01|00:00:00" : value;
+                return "'" + value + "'";
+
             } else if (dbNm.indexOf("END_DATE") >= 0) {
-                return "'2999/01/01|00:00:00'";
+                value = StringUtils.isEmpty(value) ? "2999/01/01|00:00:00" : value;
+                return "'" + value + "'";
+
             } else if (dbNm.indexOf("_DATE") >= 0) {
-                return StringUtils.isEmpty(value) ? "'2020/01/01|00:00:00'" : "'" + value + "'";
+                value = StringUtils.isEmpty(value) ? "2020/01/01|00:00:00" : value;
+                return "'" + value + "'";
             } else if (StringUtils.isEmpty(value)) {
                 value = setFillText("ITEM**", "*", "0", String.valueOf(colIndex), field.getSize());
                 value = value + "_***";
@@ -64,7 +71,8 @@ public class FileTextUtil {
             // database function
             return "'" + result + "'";
         } else if (TextUtil.arrayContains(type, DB_NUMBER_TYPE)) {
-            return StringUtils.isEmpty(value) ? String.valueOf(currIdx) : String.valueOf(Integer.parseInt(value) + currIdx);
+            return StringUtils.isEmpty(value) ? String.valueOf(currIdx)
+                    : String.valueOf(Integer.parseInt(value) + currIdx);
         } else if (TextUtil.arrayContains(type, DB_TIME_TYPE)) {
             return "CURRENT_TIMESTAMP";
         }
@@ -108,22 +116,22 @@ public class FileTextUtil {
         return result;
     }
 
-    private static String getValueFromArray(String textVal,int currentIndex) {
+    private static String getValueFromArray(String textVal, int currentIndex) {
         String[] arrayVal = textVal.split(",");
         int index = getIndex(arrayVal.length, currentIndex);
         return arrayVal[index];
     }
 
-    private static int getIndex(int max,int current) {
-        if (current>=max) {
-            current = getIndex(max,current-max);
+    private static int getIndex(int max, int current) {
+        if (current >= max) {
+            current = getIndex(max, current - max);
         }
         return current;
     }
 
     public static void main(String[] args) {
         String value = "99001,99002";
-        for(int i=0;i<10 ;i++) {
+        for (int i = 0; i < 10; i++) {
             System.out.println(getValueFromArray(value, i));
         }
     }
