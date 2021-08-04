@@ -26,6 +26,10 @@ public class Code {
     public static final String UNIX_ENTRY = "\n";
     /* WINDOWS */
     public static final String WINDOWS_ENTRY = "\r\n";
+    public static final String SPACE_4 = "    ";
+    public static final String SPACE_8 = "        ";
+    public static final String SPACE_12 = "            ";
+    public static final String SPACE_16 = "                ";
 
     /**
      * 取得设置的参数

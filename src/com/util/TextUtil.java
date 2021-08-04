@@ -10,6 +10,15 @@ public class TextUtil {
         }
     }
 
+    public static boolean isInclude(String[] aStrArr, String target) {
+        for (String name : aStrArr) {
+            if (name.equals(target)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isNotEmpty(String arg1, String arg2) {
         return (isNotEmpty(arg1) && isNotEmpty(arg2));
     }
