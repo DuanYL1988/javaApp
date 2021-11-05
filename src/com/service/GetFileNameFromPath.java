@@ -51,24 +51,22 @@ public class GetFileNameFromPath {
 
     public static void main(String[] args) {
         GetFileNameFromPath thisClass = new GetFileNameFromPath();
-
-        thisClass.doService();
+        thisClass.doService("");
     }
 
-    public void doService() {
+    public void doService(String javaPath) {
+
+        if (!TextUtil.isNotEmpty(javaPath)) {
+            javaPath = "C:\\Users\\dylsw\\OneDrive\\图片\\gif";
+        }
+
         BufferedWriter resultFile = FileUtils.getWriter(path + "//filenames.json");
 
         StringBuilder sb = new StringBuilder();
 
         imgFolders = new HashMap<String, List<File>>();
-        String javaPath = "C:\\Users\\dylsw\\OneDrive\\图片";
-//        String javaPath = "D:\\休闲时光\\学习资料\\man hua\\巨乳ファンタジー外伝2";
         getImageFrombaseFolder(javaPath);
-        /*
-         * String jspPath = ""; sb.append(getFilesName(jspPath));
-         *
-         * String docPath = ""; sb.append(getFilesName(docPath));
-         */
+
         System.out.println(creatJson(javaPath, resultFile));
         logger.info("処理終了");
 
