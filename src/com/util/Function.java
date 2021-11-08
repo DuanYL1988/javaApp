@@ -7,8 +7,13 @@ import java.text.NumberFormat;
 public class Function {
 
     public static void main(String[] args) {
-        String testRst = taxCalculation("1", "1", "2", new BigDecimal("24691357802.46"), new BigDecimal("616"));
+        // 2.469135780246
+        String testRst = taxCalculation("1", "1", "2", new BigDecimal("2.469135780246"), new BigDecimal("616"));
         System.out.println(testRst);
+        String testRst2 = taxCalculation("1", "1", "2", new BigDecimal("24691357802.46"), new BigDecimal("616"));
+        System.out.println(testRst2);
+        String testRst3 = taxCalculation("1", "1", "2", new BigDecimal("400"), new BigDecimal("616"));
+        System.out.println(testRst3);
     }
 
     /**
@@ -60,12 +65,15 @@ public class Function {
                 }
             }
         }
-        int digits = 13;
-        if (result.toString().length() > 13) {
-            digits = result.toString().length() - 13;
-        }
+
+        // 小数点以下桁数取得
+        String strResult = result.toString();
+        int preNumLen = strResult.split("\\.")[0].length();
+        int digits = 13 - preNumLen > 0 ? 13 - preNumLen : 0;
+
         NumberFormat fmt = NumberFormat.getNumberInstance();
         fmt.setMaximumFractionDigits(digits);
-        return fmt.format(result);
+        strResult = fmt.format(result);
+        return strResult;
     }
 }
