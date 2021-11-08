@@ -1,12 +1,13 @@
 package com.util;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.NumberFormat;
 
 public class Function {
 
     public static void main(String[] args) {
-        String testRst = taxCalculation("1", "1", "1", new BigDecimal("515"), new BigDecimal("616"));
+        String testRst = taxCalculation("1", "1", "2", new BigDecimal("24691357802.46"), new BigDecimal("616"));
         System.out.println(testRst);
     }
 
@@ -40,28 +41,31 @@ public class Function {
             } else {
                 if ("1".equals(conTaxRateKbn)) {
                     // 消費税率区分 = 1
-                    result = agreementAmont.multiply(new BigDecimal("0.03"));
+                    result = agreementAmont.multiply(new BigDecimal("0.03"), MathContext.DECIMAL64);
 
                 } else if ("2".equals(conTaxRateKbn)) {
                     // 消費税率区分 = 2
-                    result = agreementAmont.multiply(new BigDecimal("0.05"));
+                    result = agreementAmont.multiply(new BigDecimal("0.05"), MathContext.DECIMAL64);
 
                 } else if ("3".equals(conTaxRateKbn)) {
                     // 消費税率区分 = 3
-                    result = agreementAmont.multiply(new BigDecimal("0.08"));
+                    result = agreementAmont.multiply(new BigDecimal("0.08"), MathContext.DECIMAL64);
 
                 } else if ("4".equals(conTaxRateKbn)) {
                     // 消費税率区分 = 4
-                    result = agreementAmont.multiply(new BigDecimal("0.1"));
+                    result = agreementAmont.multiply(new BigDecimal("0.1"), MathContext.DECIMAL64);
 
                 } else {
                     result = BigDecimal.ZERO;
                 }
             }
         }
-
+        int digits = 13;
+        if (result.toString().length() > 13) {
+            digits = result.toString().length() - 13;
+        }
         NumberFormat fmt = NumberFormat.getNumberInstance();
-        fmt.setMaximumFractionDigits(13);
+        fmt.setMaximumFractionDigits(digits);
         return fmt.format(result);
     }
 }
