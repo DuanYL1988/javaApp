@@ -140,7 +140,6 @@ public class MainFrame extends JFrame implements ActionListener {
     /**
      * 主处理
      */
-    @Override
     public void actionPerformed(ActionEvent action) {
         String websit = textWebsit.getText();
         String account = textUserAccount.getText();
@@ -211,8 +210,7 @@ public class MainFrame extends JFrame implements ActionListener {
     /**
      * 输入检查
      *
-     * @param mode
-     *            卡号加密模式
+     * @param mode 卡号加密模式
      */
     private String validate(String action, String websit, String account, String password, boolean mode) {
         String message = "";

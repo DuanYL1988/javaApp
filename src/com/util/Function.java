@@ -71,6 +71,10 @@ public class Function {
         int preNumLen = strResult.split("\\.")[0].length();
         int digits = 13 - preNumLen > 0 ? 13 - preNumLen : 0;
 
+        if (strResult.length() > 13) {
+            strResult = strResult.substring(0, 13);
+        }
+
         NumberFormat fmt = NumberFormat.getNumberInstance();
         fmt.setMaximumFractionDigits(digits);
         strResult = fmt.format(result);

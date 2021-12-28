@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -49,9 +50,13 @@ public class GetFileNameFromPath {
         }
     }
 
+    @SuppressWarnings("resource")
     public static void main(String[] args) {
         GetFileNameFromPath thisClass = new GetFileNameFromPath();
-        thisClass.doService("");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("输入路径");
+        String path = scanner.nextLine();
+        thisClass.doService(path);
     }
 
     public void doService(String javaPath) {
