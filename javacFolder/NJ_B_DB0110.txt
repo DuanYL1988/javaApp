@@ -1,0 +1,80 @@
+---------------------------------------------------------------
+-- 店舗発注データインポート
+-- p_business_cd    VARCHAR
+-- 戻り値            INTEGER（[90]システムエラー  [91]データ無エラー）
+----------------------------------------------------------------
+CREATE OR REPLACE FUNCTION NJ_B_DB0110(p_business_cd VARCHAR)
+RETURNS INT 
+AS
+'
+DECLARE 
+
+    p_execute_datetime        VARCHAR;         -- 起動日時
+    p_id                      VARCHAR;         -- 実行識別名
+    p_end_datetime            VARCHAR;         -- 終了日時
+    p_disposition_id          VARCHAR;         -- 処理ID
+    p_status                  VARCHAR;         -- 実行ステータス
+    p_message_1               VARCHAR;         -- メッセージ（１）
+    p_message_2               VARCHAR;         -- メッセージ（２）
+    p_record_reg_user_cd      VARCHAR;         -- 登録者コード
+    p_record_reg_date         VARCHAR;         -- 登録日時
+    p_record_upd_user_cd      VARCHAR;         -- 最終更新者コード
+    p_record_upd_date         VARCHAR;         -- 最終更新日時
+    p_message_head            VARCHAR;         -- メッセージ（２）処理名
+
+BEGIN
+
+    -- バッチログ登録値
+    p_execute_datetime := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');
+    p_id := ''NJ_B_DB0110'';
+    p_disposition_id := ''NJ_B_DB0110'';
+    p_status := ''1'';
+    p_message_1 := ''開始しました'';
+    p_record_reg_date := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss''); 
+    p_record_reg_user_cd:= ''SYSTEM'';
+    p_record_upd_date := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');   
+    p_record_upd_user_cd := ''SYSTEM'';
+
+    -- バッチログ作成
+   　BEGIN
+        CALL family_batchlog_insert(p_business_cd, p_execute_datetime, p_id, p_end_datetime, p_disposition_id, p_status, p_message_1, p_message_2, p_record_reg_user_cd, p_record_reg_date, p_record_upd_user_cd, p_record_upd_date);
+    EXCEPTION
+        WHEN OTHERS THEN
+        RETURN 90;
+    END;
+    
+
+    BEGIN
+        -- 業務処理開始
+
+
+        -- 業務処理終了
+
+        -- バッチログ登録値
+        p_status := ''3'';                                                     -- 実行ステータス(3:正常終了)
+        p_message_1 := ''正常終了'';                                             -- エラーメッセージ（１）
+        p_end_datetime := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');           --終了日時
+        p_record_upd_date := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');        --最終更新日時
+        
+        -- バッチログ更新
+        CALL family_batchlog_update(p_business_cd, p_execute_datetime, p_id, p_end_datetime, p_status, p_message_1, p_message_2, p_record_upd_user_cd, p_record_upd_date);
+        RETURN 0;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+
+        -- バッチログ登録値
+        p_status := ''2'';                                                    -- 実行ステータス(2:異常終了)
+        p_message_1 := ''異常終了'';                                           -- エラーメッセージ（１）
+        p_message_2 := CONCAT(p_message_head,''|'',SQLERRM);                  -- エラーメッセージ（２）
+        p_end_datetime := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');          --終了日時
+        p_record_upd_date := TO_CHAR(NOW(), ''yyyy/mm/dd|hh24:mi:ss'');       --最終更新日時
+        
+        -- バッチログ更新
+        CALL family_batchlog_update(p_business_cd, p_execute_datetime, p_id, p_end_datetime, p_status, p_message_1, p_message_2, p_record_upd_user_cd, p_record_upd_date);
+        RETURN 90;
+    END;
+END;
+'
+ LANGUAGE plpgsql;
+

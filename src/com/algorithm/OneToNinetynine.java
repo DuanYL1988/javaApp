@@ -2,7 +2,7 @@ package com.algorithm;
 
 import java.util.Date;
 
-import com.util.DateTimeUtil;
+import com.application.util.DateTimeUtil;
 
 public class OneToNinetynine {
 
