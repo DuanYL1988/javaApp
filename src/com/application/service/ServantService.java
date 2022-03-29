@@ -1,21 +1,30 @@
 package com.application.service;
 
-import org.apache.ibatis.session.SqlSession;
+import java.util.List;
 
-import com.application.dao.ServantRepository;
+import com.application.dao.ServantDao;
 import com.application.model.Servant;
 
 public class ServantService extends MybatisBase {
 
-    ServantRepository dao;
-
-    public ServantService() {
-        SqlSession session = super.getSession();
-        dao = session.getMapper(ServantRepository.class);
+    /**
+     * @param id
+     */
+    public void getServant(String id) {
+        ServantDao dao = super.getSession().getMapper(ServantDao.class);
+        Servant rs = dao.selectOneById(id);
+        System.out.println(rs.getCreateDatetime());
+        super.colseSession();
     }
 
-    public void getServant(String id) {
-        Servant rs = dao.selectOneById(id);
-        System.out.println(rs.getName());
+    /**
+     * @param  dto
+     * @return
+     */
+    public List<Servant> getList(Servant dto) {
+        ServantDao dao = super.getSession().getMapper(ServantDao.class);
+        List<Servant> resultList = dao.selectByDto(dto);
+        super.colseSession();
+        return resultList;
     }
 }

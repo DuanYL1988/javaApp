@@ -15,7 +15,7 @@ public class FileUtils {
     /**
      * 取得文件内容
      *
-     * @param file
+     * @param  file
      * @return
      */
     public static List<String> getFileText(File file) {
@@ -36,7 +36,7 @@ public class FileUtils {
     /**
      * 取得写文件流
      *
-     * @param fullpath
+     * @param  fullpath
      * @return
      */
     public static BufferedWriter getWriter(String fullpath) {

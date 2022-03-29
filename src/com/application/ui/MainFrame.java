@@ -10,7 +10,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
+import com.application.creater.DaoCreater;
+import com.application.creater.ModelCreater;
+import com.application.creater.PageCreater;
+import com.application.creater.ServiceCreater;
+import com.application.dto.Table;
 import com.application.jdbc.SqliteUtil;
+import com.application.service.GetTableInfo;
 
 public class MainFrame extends JFrame {
 
@@ -43,13 +49,13 @@ public class MainFrame extends JFrame {
         btn1.addActionListener(eventBtn1());
         add(btn1);
 
-        btn2 = new JButton("生成代码");
+        btn2 = new JButton("生成Java代码");
         btn2.setBounds(startX, startY, width, height);
         startX += width + 20;
         add(btn2);
         btn2.addActionListener(eventBtn2());
 
-        btn3 = new JButton("生成文件夹");
+        btn3 = new JButton("生成Spring代码");
         btn3.setBounds(startX, startY, width, height);
         startX += width + 20;
         add(btn3);
@@ -88,7 +94,27 @@ public class MainFrame extends JFrame {
     private ActionListener eventBtn2() {
         ActionListener event = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("BTN2");
+                GetTableInfo service = new GetTableInfo();
+                Table table = service.getTableInfoFromFile("resources\\SERVANT.ddl");
+
+                String projectName = "javaApp";
+                String basePkg = "com.application";
+                boolean createFlag = true;
+                boolean springFlag = false;
+                //
+                ModelCreater creater = new ModelCreater();
+                creater.createModel(table, projectName, basePkg, createFlag, springFlag);
+                //
+                DaoCreater daoC = new DaoCreater(table);
+                daoC.createMappingXml(table, projectName, basePkg, createFlag, false);
+                daoC.createMybatis(table, projectName, basePkg, createFlag, false);
+                // PageCreater page = new PageCreater();
+                // page.createController(table, projectName, basePkg, createFlag);
+                // //
+                // ServiceCreater serviceC = new ServiceCreater();
+                // serviceC.createServiceImpl(table, projectName, basePkg, createFlag);
+                // serviceC.createService(table, projectName, basePkg, createFlag);
+                // //
             }
         };
         return event;
@@ -100,6 +126,31 @@ public class MainFrame extends JFrame {
     private ActionListener eventBtn3() {
         ActionListener event = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
+
+                GetTableInfo service = new GetTableInfo();
+                Table table = service.getTableInfoFromFile("resources\\SERVANT.ddl");
+
+                String projectName = "SpringBootProject";
+                String basePkg = "com.springboot.demo";
+                boolean createFlag = true;
+                boolean hibernateFlag = true;
+                //
+                ModelCreater creater = new ModelCreater();
+                creater.createModel(table, projectName, basePkg, createFlag, hibernateFlag);
+                //
+                DaoCreater daoC = new DaoCreater(table);
+                daoC.createMappingXml(table, projectName, basePkg, createFlag, hibernateFlag);
+                daoC.createMybatis(table, projectName, basePkg, createFlag, hibernateFlag);
+                if (hibernateFlag) {
+                    daoC.createHibernate(table, projectName, basePkg, createFlag);
+                }
+                //
+                PageCreater page = new PageCreater();
+                page.createController(table, projectName, basePkg, createFlag, hibernateFlag);
+                //
+                ServiceCreater serviceC = new ServiceCreater();
+                serviceC.createServiceImpl(table, projectName, basePkg, createFlag, hibernateFlag);
+                serviceC.createService(table, projectName, basePkg, createFlag);
             }
         };
         return event;

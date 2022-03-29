@@ -47,7 +47,7 @@ public class PasswordFrame extends JFrame implements ActionListener {
     JTextArea result;
 
     public static void main(String args[]) {
-        String version = propUtil.getParamByKey(Code.VERSION, null, Code.MODE_PARAM);
+        String version = "1.1";
         version = "个人密码管理  " + version;
         new PasswordFrame(version);
     }
@@ -158,7 +158,7 @@ public class PasswordFrame extends JFrame implements ActionListener {
         // DB mode
         if (db) {
             if ("查找".equals(kbn)) {
-//                String result = util.dbConnection(websit, account, bank_kbn);
+                // String result = util.dbConnection(websit, account, bank_kbn);
                 String result = "";
                 if (!TextUtil.isNotEmpty(result)) {
                     resultText.append(Code.MSG_SELECT_MARRING);
@@ -179,7 +179,7 @@ public class PasswordFrame extends JFrame implements ActionListener {
                 if (bank_kbn && TextUtil.isNotEmpty(account)) {
                     account = security.enCrypt(account);
                 }
-                String pswd = propUtil.getParamByKey(websit, account, Code.MODE_DATE);
+                String pswd = propUtil.getParamByKey(websit + account + Code.MODE_DATE);
                 if (TextUtil.isNotEmpty(pswd)) {
                     resultText.append(Code.MSG_SELECT_SUCCESS + "\n");
                     resultText.append("密码:" + security.deCrypt(pswd));
@@ -192,7 +192,7 @@ public class PasswordFrame extends JFrame implements ActionListener {
                     }
                 }
             } else {
-                String pswd = propUtil.getParamByKey(websit, account, Code.MODE_DATE);
+                String pswd = propUtil.getParamByKey(websit + account + Code.MODE_DATE);
                 if (TextUtil.isNotEmpty(pswd)) {
                     resultText.append(Code.MSG_UPDATE_MARRING);
                 } else {
@@ -242,14 +242,14 @@ public class PasswordFrame extends JFrame implements ActionListener {
      */
     private void setDefaultSelect(JRadioButton bank, JRadioButton notbank, JRadioButton file, JRadioButton database) {
         // 保存模式
-        String param_save = propUtil.getParamByKey(Code.SAVE_KBN, null, Code.MODE_PARAM);
+        String param_save = propUtil.getParamByKey(Code.SAVE_KBN + Code.MODE_PARAM);
         if (param_save.equals("0")) {
             file.setSelected(true);
         } else {
             database.setSelected(true);
         }
         // 账号加密
-        String param_bank = propUtil.getParamByKey(Code.BANK_KBN, null, Code.MODE_PARAM);
+        String param_bank = propUtil.getParamByKey(Code.BANK_KBN + Code.MODE_PARAM);
         if (param_bank.equals("1")) {
             bank.setSelected(true);
         } else {

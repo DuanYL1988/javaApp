@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-    <!-- 扫描包 -->
+    <!-- 实体类 -->
     <typeAliases>
         <package name="com.application.model" />
     </typeAliases>
@@ -19,7 +19,11 @@
         </environment>
     </environments>
     
+    <!-- 映射器 -->  
     <mappers>
+        <package name="com.application.dao"/>
+        <!-- 
         <mapper resource="com/application/dao/mapper/ServantMapper.xml"/>
+         -->
     </mappers>
 </configuration>

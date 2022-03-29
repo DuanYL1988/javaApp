@@ -4,12 +4,12 @@ import java.util.Date;
 
 public class Servant {
     /**
-     * ID
+     * IDPRIMARYKEY
      */
     private String id;
 
     /**
-     * 立绘图片文件夹名
+     * 立绘图片文件夹名UNIQUE
      */
     private String imgName;
 
@@ -81,7 +81,7 @@ public class Servant {
     /**
      * 突破极限
      */
-    private Integer limit;
+    private Integer limitLevel;
 
     /**
      * 特性
@@ -114,311 +114,312 @@ public class Servant {
     private Date updateDatetime;
 
     /**
-     * 设定ID
+     * 设定IDPRIMARYKEY
      */
-    public void setId(String id) {
+    public void setId(String id){
         this.id = null == id ? "" : id;
     }
 
     /**
-     * 取得ID
+     * 取得IDPRIMARYKEY
      */
-    public String getId() {
+    public String getId(){
         return id;
     }
 
     /**
-     * 设定立绘图片文件夹名
+     * 设定立绘图片文件夹名UNIQUE
      */
-    public void setImgName(String imgName) {
+    public void setImgName(String imgName){
         this.imgName = null == imgName ? "" : imgName;
     }
 
     /**
-     * 取得立绘图片文件夹名
+     * 取得立绘图片文件夹名UNIQUE
      */
-    public String getImgName() {
+    public String getImgName(){
         return imgName;
     }
 
     /**
      * 设定名
      */
-    public void setName(String name) {
+    public void setName(String name){
         this.name = null == name ? "" : name;
     }
 
     /**
      * 取得名
      */
-    public String getName() {
+    public String getName(){
         return name;
     }
 
     /**
      * 设定昵称
      */
-    public void setNickName(String nickName) {
+    public void setNickName(String nickName){
         this.nickName = null == nickName ? "" : nickName;
     }
 
     /**
      * 取得昵称
      */
-    public String getNickName() {
+    public String getNickName(){
         return nickName;
     }
 
     /**
      * 设定兵种
      */
-    public void setClassType(String classType) {
+    public void setClassType(String classType){
         this.classType = null == classType ? "" : classType;
     }
 
     /**
      * 取得兵种
      */
-    public String getClassType() {
+    public String getClassType(){
         return classType;
     }
 
     /**
      * 设定从者类型(拐,打手)
      */
-    public void setHeroType(String heroType) {
+    public void setHeroType(String heroType){
         this.heroType = null == heroType ? "" : heroType;
     }
 
     /**
      * 取得从者类型(拐,打手)
      */
-    public String getHeroType() {
+    public String getHeroType(){
         return heroType;
     }
 
     /**
      * 设定活动从者
      */
-    public void setEventFlag(String eventFlag) {
+    public void setEventFlag(String eventFlag){
         this.eventFlag = null == eventFlag ? "" : eventFlag;
     }
 
     /**
      * 取得活动从者
      */
-    public String getEventFlag() {
+    public String getEventFlag(){
         return eventFlag;
     }
 
     /**
      * 设定生命值
      */
-    public void setHp(Integer hp) {
+    public void setHp(Integer hp){
         this.hp = hp;
     }
 
     /**
      * 取得生命值
      */
-    public Integer getHp() {
+    public Integer getHp(){
         return hp;
     }
 
     /**
      * 设定攻击
      */
-    public void setAttact(Integer attact) {
+    public void setAttact(Integer attact){
         this.attact = attact;
     }
 
     /**
      * 取得攻击
      */
-    public Integer getAttact() {
+    public Integer getAttact(){
         return attact;
     }
 
     /**
      * 设定1技能
      */
-    public void setSkill1(String skill1) {
+    public void setSkill1(String skill1){
         this.skill1 = null == skill1 ? "" : skill1;
     }
 
     /**
      * 取得1技能
      */
-    public String getSkill1() {
+    public String getSkill1(){
         return skill1;
     }
 
     /**
      * 设定2技能
      */
-    public void setSkill2(String skill2) {
+    public void setSkill2(String skill2){
         this.skill2 = null == skill2 ? "" : skill2;
     }
 
     /**
      * 取得2技能
      */
-    public String getSkill2() {
+    public String getSkill2(){
         return skill2;
     }
 
     /**
      * 设定3技能
      */
-    public void setSkill3(String skill3) {
+    public void setSkill3(String skill3){
         this.skill3 = null == skill3 ? "" : skill3;
     }
 
     /**
      * 取得3技能
      */
-    public String getSkill3() {
+    public String getSkill3(){
         return skill3;
     }
 
     /**
      * 设定宝具名
      */
-    public void setSkillExtra(String skillExtra) {
+    public void setSkillExtra(String skillExtra){
         this.skillExtra = null == skillExtra ? "" : skillExtra;
     }
 
     /**
      * 取得宝具名
      */
-    public String getSkillExtra() {
+    public String getSkillExtra(){
         return skillExtra;
     }
 
     /**
      * 设定宝具类型(单体,全体)
      */
-    public void setExtraType(String extraType) {
+    public void setExtraType(String extraType){
         this.extraType = null == extraType ? "" : extraType;
     }
 
     /**
      * 取得宝具类型(单体,全体)
      */
-    public String getExtraType() {
+    public String getExtraType(){
         return extraType;
     }
 
     /**
      * 设定宝具颜色
      */
-    public void setExtraColor(String extraColor) {
+    public void setExtraColor(String extraColor){
         this.extraColor = null == extraColor ? "" : extraColor;
     }
 
     /**
      * 取得宝具颜色
      */
-    public String getExtraColor() {
+    public String getExtraColor(){
         return extraColor;
     }
 
     /**
      * 设定突破极限
      */
-    public void setLimit(Integer limit) {
-        this.limit = limit;
+    public void setLimitLevel(Integer limitLevel){
+        this.limitLevel = limitLevel;
     }
 
     /**
      * 取得突破极限
      */
-    public Integer getLimit() {
-        return limit;
+    public Integer getLimitLevel(){
+        return limitLevel;
     }
 
     /**
      * 设定特性
      */
-    public void setTraits(String traits) {
+    public void setTraits(String traits){
         this.traits = null == traits ? "" : traits;
     }
 
     /**
      * 取得特性
      */
-    public String getTraits() {
+    public String getTraits(){
         return traits;
     }
 
     /**
      * 设定队伍
      */
-    public void setTeam(Integer team) {
+    public void setTeam(Integer team){
         this.team = team;
     }
 
     /**
      * 取得队伍
      */
-    public Integer getTeam() {
+    public Integer getTeam(){
         return team;
     }
 
     /**
      * 设定喜欢
      */
-    public void setFavorite(String favorite) {
+    public void setFavorite(String favorite){
         this.favorite = null == favorite ? "" : favorite;
     }
 
     /**
      * 取得喜欢
      */
-    public String getFavorite() {
+    public String getFavorite(){
         return favorite;
     }
 
     /**
      * 设定评价等级
      */
-    public void setRank(String rank) {
+    public void setRank(String rank){
         this.rank = null == rank ? "" : rank;
     }
 
     /**
      * 取得评价等级
      */
-    public String getRank() {
+    public String getRank(){
         return rank;
     }
 
     /**
      * 设定登录日期
      */
-    public void setCreateDatetime(Date createDatetime) {
+    public void setCreateDatetime(Date createDatetime){
         this.createDatetime = createDatetime;
     }
 
     /**
      * 取得登录日期
      */
-    public Date getCreateDatetime() {
+    public Date getCreateDatetime(){
         return createDatetime;
     }
 
     /**
      * 设定更新日期
      */
-    public void setUpdateDatetime(Date updateDatetime) {
+    public void setUpdateDatetime(Date updateDatetime){
         this.updateDatetime = updateDatetime;
     }
 
     /**
      * 取得更新日期
      */
-    public Date getUpdateDatetime() {
+    public Date getUpdateDatetime(){
         return updateDatetime;
     }
+
 
 }

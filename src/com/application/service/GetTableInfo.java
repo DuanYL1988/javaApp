@@ -40,7 +40,6 @@ public class GetTableInfo {
             // 基本信息
             if (i == 0) {
                 String baseInfo = line.split(Context.SPACE)[2];
-                System.out.println(baseInfo);
                 if (baseInfo.indexOf(Context.POINT) > 0) {
                     // DB名
                     table.setDatabaseName(baseInfo.split("\\.")[0]);
@@ -62,8 +61,15 @@ public class GetTableInfo {
                 String baseNm = columnInfo[0].replace(Context.COMMA, "").trim();
                 col.setColumnName(baseNm);
                 col.setSourceName(TextUtil.transNmDbToJava(baseNm, false));
+
                 // 类型
                 String baseType = columnInfo[1].trim();
+                // varcha2对应
+                if (baseType.indexOf("VARCHAR2") >= 0) {
+                    baseType = baseType.replace("VARCHAR2", "VARCHAR");
+                } else if (baseType.indexOf("NUMBER") >= 0) {
+                    baseType = "NUMERIC";
+                }
                 // 长度
                 int lengthIndex = baseType.indexOf("(");
                 if (lengthIndex > 0) {
@@ -96,7 +102,7 @@ public class GetTableInfo {
 
     private String javaTypeMap(String dbType, int length) {
         String type = "String";
-        if ("NUMBER".equals(dbType)) {
+        if ("NUMBER".equals(dbType) || "NUMERIC".equals(dbType)) {
             type = "Integer";
         } else if ("TIMESTAMP".equals(dbType)) {
             type = "Date";

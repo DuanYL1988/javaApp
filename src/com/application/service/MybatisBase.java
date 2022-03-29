@@ -10,8 +10,9 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 public class MybatisBase {
 
+    SqlSession session = null;
+
     public SqlSession getSession() {
-        SqlSession session = null;
         String resource = "mybatis-config.xml";
         InputStream ins;
         try {
@@ -22,5 +23,9 @@ public class MybatisBase {
             e.printStackTrace();
         }
         return session;
+    }
+
+    public void colseSession() {
+        session.close();
     }
 }

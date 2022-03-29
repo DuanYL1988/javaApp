@@ -15,9 +15,11 @@ public class PropertyUtil {
 
     private static String FILE_PATH_OUTPUT;
 
-    private static final String FILE_NAME_PARAM = "param.properties";
+    private static final String FILE_NAME_PARAM = "config.properties";
 
     private final FileReadWriteUtil fileUtil = new FileReadWriteUtil();
+
+    Properties prop;
 
     /**
      * 构造方法
@@ -26,6 +28,12 @@ public class PropertyUtil {
         File file = new File("");
         FILE_PATH_PARAM = file.getAbsolutePath() + "\\" + FILE_NAME_PARAM;
         fileUtil.initFile(FILE_PATH_PARAM);
+        prop = getProp(FILE_PATH_PARAM);
+    }
+
+    public static void main(String[] args) {
+        PropertyUtil util = new PropertyUtil();
+        util.checkParamters(util.prop);
     }
 
     /**
@@ -72,18 +80,8 @@ public class PropertyUtil {
     /**
      * 取得匹配的属性值
      */
-    public String getParamByKey(String websit, String account, String path) {
-        String key = websit;
-        String value = null;
-        if (path.equals(Code.MODE_PARAM)) {
-            path = FILE_NAME_PARAM;
-        } else {
-            key = websit + Code.SPILT + account;
-            path = FILE_PATH_OUTPUT;
-        }
-        Properties prop = getProp(path);
-        value = prop.getProperty(key);
-        return value;
+    public String getParamByKey(String key) {
+        return prop.getProperty(key);
     }
 
     /**

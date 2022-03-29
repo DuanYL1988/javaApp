@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>{title}详细</title>
+  <link rel="stylesheet" th:href="@{/common.css}"/>
+  <script th:src="@{/jquery-3.4.1.min.js}"></script>
+  <script th:src="@{/commonService.js}"></script>
+</head>
+<body>
+  <main>
+    <!-- 输入区域 -->
+    <div class="wk_info_area">
+      <form id="infoForm">
+        <div th:each="maps:${displayMap}" class="editArea">
+          <span th:text="${maps.key}"></span>
+          <div class="inputRow">
+            <div th:each="layout:${maps.value}" class="inputCell">
+              <label th:text="${layout.label}"></label>
+              <label style="display: none" th:text="${layout.value}"></label>
+              <input type="text" th:name="${layout.name}" th:value="${layout.value}"/>
+              <label style="errorMsg"/>
+            </div>
+          </div>
+        </div>
+        <!-- 通过JS生成 -->
+        <div id="hideArea">
+          <input type="hidden" th:name="id" th:value="${id}"/>
+        </div>
+      </form>
+        
+    </div>
+    
+    <!-- 按钮动作区域 -->
+    <div id="eventArea">
+      <!-- 通过JS生成 -->
+    </div>
+    
+  </main>
+  <div id="popup">
+    <div id="grayup"></div>
+    <div id="popupWindow">
+      <div style="height:30px;float:right;padding-top:5px">
+        <button type="button" style="width:70px;height:30px" onclick="closePopupWindow()">CLOSE</button>
+      </div>
+      <div id="messageArea" style="overflow-y:scroll;margin-top:45px;width:650px;height:240px;color:red"></div>
+      <div style="text-align:center">
+        <button type="button" style="width:90px;height:35px" onclick="closePopupWindow()">OK</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
